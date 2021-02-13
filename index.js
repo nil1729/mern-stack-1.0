@@ -3,7 +3,9 @@ if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 // Importing all necessary modules
 const express = require('express'),
 	mysql = require('mysql'),
-	app = express();
+	app = express(),
+	errorHandler = require('./middleware/errorHandler'),
+	authRoutes = require('./routes/auth.routes');
 
 // Middleware read JSON Request Body
 app.use(express.json());
@@ -27,6 +29,12 @@ db.connect((err) => {
 // Set (db) as global variable
 global.db = db;
 
+// Use API Routes
+app.use('/api/v1/auth', authRoutes);
+
+// Error Handler Middleware
+app.use(errorHandler);
+
 // PORT for this Web Application
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
@@ -39,6 +47,7 @@ process.on('unhandledRejection', (err) => {
 
 	// Closed the Server
 	server.close(() => {
+		db.end();
 		console.log('Server closed due to unhandled promise rejection');
 		process.exit(1);
 	});
