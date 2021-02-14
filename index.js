@@ -3,12 +3,16 @@ if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 // Importing all necessary modules
 const express = require('express'),
 	mysql = require('mysql'),
-	app = express(),
-	errorHandler = require('./middleware/errorHandler'),
-	authRoutes = require('./routes/auth.routes');
+	cookieParser = require('cookie-parser');
+(app = express()),
+	(errorHandler = require('./middleware/errorHandler')),
+	(authRoutes = require('./routes/auth.routes'));
 
 // Middleware read JSON Request Body
 app.use(express.json());
+
+// Use cookies for storing the ACCESS TOKEN
+app.use(cookieParser());
 
 // Database Setup (Create Connection to Database)
 const db = mysql.createConnection({

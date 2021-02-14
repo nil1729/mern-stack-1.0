@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const ErrorResponse = require('../utils/errorResponse');
+const jwt = require('jsonwebtoken');
 
+// Sign up service
 const signUp = (data, res, next) => {
 	let { name, email, password } = data;
 	// Hashing Password
@@ -49,15 +51,17 @@ const signUp = (data, res, next) => {
 						if (err) return next(err);
 
 						// Successful Response
-						res.status(201).json({
-							success: true,
+						let data = {
+							payload: {
+								email,
+							},
 							message:
 								'User registration successful. Kindly verify your email address',
-							responses: {
-								accessToken: null,
-								emailVerified: false,
-							},
-						});
+							emailVerified: false,
+						};
+
+						// create Token and send with cookies
+						sendTokenResponseWithCookie(data, 201, res, next);
 					});
 				});
 			});
@@ -65,4 +69,91 @@ const signUp = (data, res, next) => {
 	);
 };
 
-module.exports = { signUp };
+// Sign in service
+const signIn = (data, res, next) => {
+	// Finding user with given email address
+	let query = `
+		SELECT 
+			email_address, 
+			email_verified, 
+			password 
+		FROM USERS WHERE email_address = "${data.email}";
+	`;
+	db.query(query, (err, result) => {
+		if (err) return next(err);
+
+		// validate results
+		if (result.length === 0)
+			return next(
+				new ErrorResponse(
+					'Incorrect Email address or Password! Please try again',
+					401
+				)
+			);
+
+		// extract emails, password and email_verification_status
+		let { email_address: email, password, email_verified } = result[0];
+
+		bcrypt.compare(data.password, password, function (err, matched) {
+			if (err) return next(err);
+
+			// Password don't match
+			if (!matched)
+				return next(
+					new ErrorResponse(
+						'Incorrect Email address or Password! Please try again',
+						401
+					)
+				);
+
+			// Successful Response
+			let data = {
+				payload: {
+					email,
+				},
+				message: 'Successfully signed in',
+				emailVerified: email_verified === 0 ? false : true,
+			};
+
+			// create Token and send with cookies
+			sendTokenResponseWithCookie(data, 200, res, next);
+		});
+	});
+};
+
+// Send Token with Cookie
+const sendTokenResponseWithCookie = (data, statusCode, res, next) => {
+	// Create Token
+	jwt.sign(
+		data.payload,
+		process.env.JWT_SECRET,
+		{ expiresIn: '30d' },
+		(err, token) => {
+			if (err) return next(err);
+
+			// Create access token
+			let accessToken = token.replace(/[.]/g, process.env.JWT_RANDOM_STRING);
+
+			// Set Options for Cookie
+			const cookieOptions = {
+				maxAge: process.env.JWT_COOKIE_MAX_AGE,
+				httpOnly: true,
+			};
+
+			// Send responses to client
+			res
+				.status(statusCode)
+				.cookie('DEV_TOKEN', accessToken, cookieOptions)
+				.json({
+					success: true,
+					message: data.message,
+					responses: {
+						accessToken,
+						emailVerified: data.emailVerified,
+					},
+				});
+		}
+	);
+};
+
+module.exports = { signUp, signIn };
