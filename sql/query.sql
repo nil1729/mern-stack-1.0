@@ -6,3 +6,5 @@ select
     youtube_channel_url, linkedin_url, instagram_url
 from users
 inner join user_profiles on users.id = user_profiles.user_id;
+
+update user_profiles set bio = "kjfhgfkg" whr

@@ -2,7 +2,10 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('../middleware/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
+const partiallyProtectedRoute = ['/profile'];
+
 exports.checkAuthentication = asyncHandler((req, res, next) => {
+	// Proceed for authentication
 	let token;
 	// Check request headers has a "authorization" key
 	if (
@@ -18,6 +21,15 @@ exports.checkAuthentication = asyncHandler((req, res, next) => {
 
 	// check token exists or not
 	if (!token) {
+		// public views
+		if (
+			req.query.view === 'public' &&
+			req.method === 'GET' &&
+			partiallyProtectedRoute.includes(req.route.path)
+		)
+			return next();
+
+		// Otherwise throw 401 unauthorized
 		throw new ErrorResponse(
 			`You are not unauthorized to access the resource`,
 			401
@@ -67,6 +79,7 @@ exports.checkAuthentication = asyncHandler((req, res, next) => {
 				req.user.verification_email_sent === 0 ? false : true;
 
 			if (
+				req.method !== 'GET' &&
 				Object.keys(req.params).includes('user_id') &&
 				parseInt(req.params.user_id) !== req.user.id
 			)

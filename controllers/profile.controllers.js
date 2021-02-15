@@ -2,7 +2,11 @@ const asyncHandler = require('../middleware/asyncHandler'),
 	ErrorResponse = require('../utils/errorResponse'),
 	checker = require('../utils/checkFields'),
 	xss = require('xss'),
-	{ createProfile, updateProfile } = require('../services/profile.services');
+	{
+		createProfile,
+		updateProfile,
+		getProfile,
+	} = require('../services/profile.services');
 
 /**
  *
@@ -52,29 +56,29 @@ exports.profileHandler = (req, res, next) => {
 
 		// Call create profile service
 		createProfile(data, res, next);
-	} else if (req.method === 'GET' && !req.user.new_account) {
-		// Create query for getting user profile details
-		let query = `
-                SELECT 
-                    name, email_address, username, users.id,
-                    current_position, current_working_place_name,
-                    skills, location, github_username, bio, 
-                    website_url, facebook_url, twitter_url, 
-                    youtube_channel_url, linkedin_url, instagram_url
-                FROM USERS
-                INNER JOIN USER_PROFILES ON USERS.ID = USER_PROFILES.USER_ID
-                WHERE USERS.ID = ${req.user.id};
-            `;
-
-		db.query(query, (err, result) => {
-			if (err) return next(err);
-
-			// Send responses to client
-			return res.status(200).json({
-				success: true,
-				user_profile: result,
-			});
-		});
+	} else if (req.method === 'GET') {
+		let privateFields = [
+			'email_address',
+			'linkedin_url',
+			'instagram_url',
+			'facebook_url',
+			'location',
+		];
+		let publicFields = [
+			'name',
+			'username',
+			'users.id',
+			'current_position',
+			'current_working_place_name',
+			'skills',
+			'github_username',
+			'bio',
+			'website_url',
+			'twitter_url',
+			'youtube_channel_url',
+		];
+		if (req.user) publicFields.push(...privateFields);
+		getProfile(req.params.user_id, publicFields, res, next);
 	} else if (req.method === 'PUT' && !req.user.new_account) {
 		let requiredFields = [
 			'current_position',

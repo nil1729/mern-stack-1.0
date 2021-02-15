@@ -1,3 +1,5 @@
+const ErrorResponse = require('../utils/errorResponse');
+
 exports.createProfile = (data, res, next) => {
 	// Create query for SQL
 	let fields = ``;
@@ -58,6 +60,41 @@ exports.updateProfile = (data, res, next) => {
 		res.status(200).json({
 			success: true,
 			message: 'Developer profile updated successfully',
+		});
+	});
+};
+
+exports.getProfile = (user_id, fields, res, next) => {
+	// Create string for select fields
+	let queryFields = ``;
+	fields.forEach((field) => (queryFields += `${field},`));
+	queryFields = queryFields.slice(0, -1);
+
+	// Create query for getting user profile details
+	let query = `
+		SELECT 
+			${queryFields}
+		FROM USERS
+		INNER JOIN USER_PROFILES ON USERS.ID = USER_PROFILES.USER_ID
+		WHERE USERS.ID = ${user_id};
+	`;
+
+	// execute the query
+	db.query(query, (err, result) => {
+		if (err) return next(err);
+
+		if (result.length < 1)
+			return next(
+				new ErrorResponse(
+					"We look into our records. But didn't find any user",
+					404
+				)
+			);
+
+		// Send responses to client
+		return res.status(200).json({
+			success: true,
+			user_profile: result[0],
 		});
 	});
 };
