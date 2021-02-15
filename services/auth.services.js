@@ -57,7 +57,7 @@ const signUp = (data, res, next) => {
 							},
 							message:
 								'User registration successful. Kindly verify your email address',
-							emailVerified: false,
+							email_verified: false,
 						};
 
 						// create Token and send with cookies
@@ -112,7 +112,7 @@ const signIn = (data, res, next) => {
 					email,
 				},
 				message: 'Successfully signed in',
-				emailVerified: email_verified === 0 ? false : true,
+				email_verified: email_verified === 0 ? false : true,
 			};
 
 			// create Token and send with cookies
@@ -149,7 +149,7 @@ const sendTokenResponseWithCookie = (data, statusCode, res, next) => {
 					message: data.message,
 					responses: {
 						accessToken,
-						emailVerified: data.emailVerified,
+						email_verified: data.email_verified,
 					},
 				});
 		}

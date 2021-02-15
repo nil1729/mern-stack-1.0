@@ -13,6 +13,10 @@ class checker {
 		if (password && validator.isStrongPassword(password)) return true;
 		return false;
 	}
+	siteURL(url) {
+		if (url && validator.isURL(url)) return true;
+		return false;
+	}
 }
 
 module.exports = new checker();

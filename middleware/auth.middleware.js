@@ -37,8 +37,10 @@ exports.checkAuthentication = asyncHandler((req, res, next) => {
 		let query = `
                 SELECT 
                     email_address as email, 
-                    email_verified as emailVerified, 
+                    email_verified, 
                     name, username, id,
+					verification_email_sent,
+					new_account,
                     created_at, updated_at 
                     FROM USERS WHERE email_address = "${decodedToken.email}";
             `;
@@ -57,6 +59,23 @@ exports.checkAuthentication = asyncHandler((req, res, next) => {
 
 			// set user object to the request
 			req.user = result[0];
+
+			// TYPE CAST all Boolean to true/false
+			req.user.email_verified = req.user.email_verified === 0 ? false : true;
+			req.user.new_account = req.user.new_account === 0 ? false : true;
+			req.user.verification_email_sent =
+				req.user.verification_email_sent === 0 ? false : true;
+
+			if (
+				Object.keys(req.params).includes('user_id') &&
+				parseInt(req.params.user_id) !== req.user.id
+			)
+				next(
+					new ErrorResponse(
+						'You are not unauthorized to access the resource',
+						403
+					)
+				);
 
 			// Proceed to next functions
 			next();

@@ -85,9 +85,7 @@ const Login = () => {
 					</StyledHelperText>
 				</div>
 				<div className='mb-3'>
-					<StyledLabel className='form-label mb-1'>
-						Website URL<sup>*</sup>
-					</StyledLabel>
+					<StyledLabel className='form-label mb-1'>Website URL</StyledLabel>
 					<StyledInput
 						type='text'
 						className='form-control'
@@ -99,23 +97,7 @@ const Login = () => {
 					</StyledHelperText>
 				</div>
 				<div className='mb-3'>
-					<StyledLabel className='form-label mb-1'>
-						Website URL<sup>*</sup>
-					</StyledLabel>
-					<StyledInput
-						type='text'
-						className='form-control'
-						aria-describedby='emailHelp'
-						placeholder='www.nilanjandeb.me'
-					/>
-					<StyledHelperText>
-						Could be your own or company website
-					</StyledHelperText>
-				</div>
-				<div className='mb-3'>
-					<StyledLabel className='form-label mb-1'>
-						Location<sup>*</sup>
-					</StyledLabel>
+					<StyledLabel className='form-label mb-1'>Location</StyledLabel>
 					<StyledInput
 						type='text'
 						className='form-control'
@@ -128,7 +110,7 @@ const Login = () => {
 				</div>
 				<div className='mb-3'>
 					<StyledLabel className='form-label mb-1'>
-						Location<sup>*</sup>
+						Skills or Programming Languages
 					</StyledLabel>
 					<StyledInput
 						type='text'
@@ -141,9 +123,7 @@ const Login = () => {
 					</StyledHelperText>
 				</div>
 				<div className='mb-3'>
-					<StyledLabel className='form-label mb-1'>
-						Github Username<sup>*</sup>
-					</StyledLabel>
+					<StyledLabel className='form-label mb-1'>Github Username</StyledLabel>
 					<StyledInput
 						type='text'
 						className='form-control'
@@ -156,7 +136,9 @@ const Login = () => {
 					</StyledHelperText>
 				</div>
 				<div className='mb-4'>
-					<StyledLabel className='form-label mb-1'>Job Description</StyledLabel>
+					<StyledLabel className='form-label mb-1'>
+						Job Description or Bio
+					</StyledLabel>
 					<StyledTextArea
 						rows='4'
 						placeholder='Tell us a little about yourself'

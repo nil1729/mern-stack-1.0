@@ -1,4 +1,3 @@
-const asyncHandler = require('../middleware/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const checker = require('../utils/checkFields');
 const { signUp, signIn } = require('../services/auth.services');
@@ -11,7 +10,7 @@ const { signUp, signIn } = require('../services/auth.services');
  *
  */
 
-const registerHandler = (req, res, next) => {
+exports.registerHandler = (req, res, next) => {
 	let { name, email, password } = req.body;
 
 	// Check Body for required fields
@@ -46,7 +45,7 @@ const registerHandler = (req, res, next) => {
  * @access public
  *
  */
-const loginHandler = (req, res, next) => {
+exports.loginHandler = (req, res, next) => {
 	let { email, password } = req.body;
 
 	// Check Body for required fields
@@ -68,21 +67,15 @@ const loginHandler = (req, res, next) => {
  * @access private
  *
  */
-const userHandler = (req, res, next) => {
-	req.user.emailVerified = req.user.emailVerified === 0 ? false : true;
+exports.userHandler = (req, res, next) => {
 	let message;
-	if (!req.user.emailVerified)
+	if (!req.user.email_verified && req.user.verification_email_sent)
 		message =
 			'Kindly verify your Email Address. A verification link has sent to your email address';
+	delete req.user.verification_email_sent;
 	return res.status(200).json({
 		success: true,
 		message,
 		user: req.user,
 	});
-};
-
-module.exports = {
-	registerHandler,
-	loginHandler,
-	userHandler,
 };
