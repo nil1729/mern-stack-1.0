@@ -56,9 +56,6 @@ const loginHandler = (req, res, next) => {
 	if (!checker.email(email)) {
 		next(new ErrorResponse('Please provide a valid email address', 400));
 	}
-	if (!checker.password(password)) {
-		next(new ErrorResponse('Please provide a strong password', 400));
-	}
 
 	// Call Sign In Service for login user account
 	signIn({ email, password }, res, next);
@@ -72,12 +69,15 @@ const loginHandler = (req, res, next) => {
  *
  */
 const userHandler = (req, res, next) => {
+	req.user.emailVerified = req.user.emailVerified === 0 ? false : true;
+	let message;
+	if (!req.user.emailVerified)
+		message =
+			'Kindly verify your Email Address. A verification link has sent to your email address';
 	return res.status(200).json({
 		success: true,
-		user: {
-			...req.user,
-			emailVerified: req.user.emailVerified === 0 ? false : true,
-		},
+		message,
+		user: req.user,
 	});
 };
 
