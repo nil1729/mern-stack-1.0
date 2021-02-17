@@ -3,8 +3,12 @@ const express = require('express'),
 	{
 		profileHandler,
 		addExperience,
+		experienceHandler,
 	} = require('../controllers/profile.controllers'),
-	{ checkAuthentication } = require('../middleware/auth.middleware');
+	{
+		checkAuthentication,
+		experienceAuthorize,
+	} = require('../middleware/auth.middleware');
 
 router
 	.route('/')
@@ -13,5 +17,9 @@ router
 	.put(checkAuthentication, profileHandler);
 
 router.route('/experience').post(checkAuthentication, addExperience);
+router
+	.route('/experience/:exp_id')
+	.put(checkAuthentication, experienceAuthorize, experienceHandler)
+	.delete(checkAuthentication, experienceAuthorize, experienceHandler);
 
 module.exports = router;

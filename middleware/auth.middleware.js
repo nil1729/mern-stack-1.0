@@ -104,4 +104,34 @@ exports.checkAuthentication = asyncHandler((req, res, next) => {
 	});
 });
 
-const experienceAuthorize = (req, res, next) => {};
+exports.experienceAuthorize = (req, res, next) => {
+	// If new user directly reject
+	if (req.user.new_account)
+		return next(
+			new ErrorResponse('Please first create your developer profile', 403)
+		);
+
+	// Check user authorize the experience
+	let query = `
+		SELECT 
+			id, 
+			starting_date, 
+			ending_date 
+		FROM USER_EXPERIENCES 
+		WHERE ID=${req.params.exp_id} AND USER_ID=${req.user.id}
+	`;
+
+	db.query(query, (err, result) => {
+		if (err) return next(err);
+
+		// check result array has one element
+		if (result.length === 0)
+			return next(
+				new ErrorResponse('Oops! Something went wrong with your request.', 404)
+			);
+
+		// Add job_exp to request for checking incoming Fields
+		req.job_exp = result[0];
+		next();
+	});
+};
