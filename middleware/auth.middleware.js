@@ -2,11 +2,12 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('../middleware/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
-const partiallyProtectedRoute = ['/profile'];
+const partiallyProtectedRoute = [/\/user\/(\d+)\/profile$/];
 
 exports.checkAuthentication = asyncHandler((req, res, next) => {
 	// Proceed for authentication
 	let token;
+
 	// Check request headers has a "authorization" key
 	if (
 		req.headers.authorization &&
@@ -23,11 +24,18 @@ exports.checkAuthentication = asyncHandler((req, res, next) => {
 	if (!token) {
 		// public views
 		if (
-			req.query.view === 'public' &&
 			req.method === 'GET' &&
-			partiallyProtectedRoute.includes(req.route.path)
-		)
-			return next();
+			req.query.view === 'public' &&
+			req.query.url &&
+			req.originalUrl.split('?')[0].includes(req.query.url)
+		) {
+			let matchedURL = false;
+			partiallyProtectedRoute.every((urlExp) => {
+				if (urlExp.test(req.query.url)) matchedURL = true;
+			});
+
+			if (matchedURL) return next();
+		}
 
 		// Otherwise throw 401 unauthorized
 		throw new ErrorResponse(
@@ -95,3 +103,5 @@ exports.checkAuthentication = asyncHandler((req, res, next) => {
 		});
 	});
 });
+
+const experienceAuthorize = (req, res, next) => {};

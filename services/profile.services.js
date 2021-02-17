@@ -98,3 +98,31 @@ exports.getProfile = (user_id, fields, res, next) => {
 		});
 	});
 };
+
+exports.addExperience = (data, res, next) => {
+	// Create query for SQL
+	let fields = ``;
+	let values = ``;
+	data.incomingFields.forEach((key) => {
+		fields += `${key},`;
+		values += `"${data.body[key]}",`;
+	});
+	fields += `user_id`;
+	values += `${data.user.id}`;
+
+	let query = `
+        INSERT INTO USER_EXPERIENCES(${fields})
+            VALUES(${values});
+    `;
+
+	// execute the query
+	db.query(query, (err) => {
+		if (err) return next(err);
+
+		// Send responses to client
+		res.status(201).json({
+			success: true,
+			message: 'Job experience added to your profile',
+		});
+	});
+};

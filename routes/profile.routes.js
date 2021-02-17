@@ -1,12 +1,17 @@
 const express = require('express'),
 	router = express.Router({ mergeParams: true }),
-	{ profileHandler } = require('../controllers/profile.controllers'),
+	{
+		profileHandler,
+		addExperience,
+	} = require('../controllers/profile.controllers'),
 	{ checkAuthentication } = require('../middleware/auth.middleware');
 
 router
-	.route('/profile')
+	.route('/')
 	.get(checkAuthentication, profileHandler)
 	.post(checkAuthentication, profileHandler)
 	.put(checkAuthentication, profileHandler);
+
+router.route('/experience').post(checkAuthentication, addExperience);
 
 module.exports = router;

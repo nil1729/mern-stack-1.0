@@ -6,13 +6,14 @@ const asyncHandler = require('../middleware/asyncHandler'),
 		createProfile,
 		updateProfile,
 		getProfile,
+		addExperience,
 	} = require('../services/profile.services');
 
 /**
  *
  * @desc User Profile edit/create/get Handler
  * @route /api/v1/user/:id/profile
- * @access private
+ * @access private (public for GET request)
  *
  */
 
@@ -125,4 +126,60 @@ exports.profileHandler = (req, res, next) => {
 		updateProfile(data, res, next);
 	} else
 		next(new ErrorResponse('Requested address not found on this server', 400));
+};
+
+/**
+ *
+ * @desc User experience add Handler
+ * @route /api/v1/user/:id/profile/experience
+ * @access private
+ *
+ */
+
+exports.addExperience = (req, res, next) => {
+	if (req.user.new_account)
+		return next(
+			new ErrorResponse('Please first create your developer profile', 403)
+		);
+
+	let requiredFields = ['job_title', 'company_name'];
+	let incomingFields = Object.keys(req.body);
+	let errors = [];
+
+	// Checking for required fields
+	for (let i = 0; i < requiredFields.length; i++) {
+		if (
+			!req.body[requiredFields[i]] ||
+			(req.body[requiredFields[i]] &&
+				req.body[requiredFields[i]].trim().length === 0)
+		)
+			return next(new ErrorResponse('Please add all required fields', 400));
+	}
+
+	// Checking for starting_date and ending_date
+	let { starting_date, ending_date } = req.body;
+	if (starting_date) {
+		if (!checker.checkDate(starting_date, 'smaller', new Date()))
+			errors.push('Please correctly mention the starting_date');
+	}
+	if (ending_date) {
+		if (!checker.checkDate(ending_date, 'greater', starting_date))
+			errors.push('Please correctly mention the ending_date');
+	}
+	if (errors.length > 0)
+		next(new ErrorResponse('Please provide valid Date(s)', 400, errors));
+
+	// if job description added
+	if (req.body.job_description)
+		req.body.job_description = xss(req.body.job_description);
+
+	// proceed further
+	let data = {
+		incomingFields,
+		body: req.body,
+		user: req.user,
+	};
+
+	// call add experience service
+	addExperience(data, res, next);
 };

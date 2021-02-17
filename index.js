@@ -40,7 +40,7 @@ global.db = db;
 
 // Use API Routes
 app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/user/:user_id', userProfileRoutes);
+app.use('/api/v1/user/:user_id/profile', userProfileRoutes);
 
 // Error Handler Middleware
 app.use(errorHandler);
