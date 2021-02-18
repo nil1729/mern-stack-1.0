@@ -135,3 +135,35 @@ exports.experienceAuthorize = (req, res, next) => {
 		next();
 	});
 };
+
+exports.educationAuthorize = (req, res, next) => {
+	// If new user directly reject
+	if (req.user.new_account)
+		return next(
+			new ErrorResponse('Please first create your developer profile', 403)
+		);
+
+	// Check user authorize the education
+	let query = `
+		SELECT 
+			id, 
+			starting_date, 
+			ending_date 
+		FROM USER_EDUCATIONS 
+		WHERE ID=${req.params.edu_id} AND USER_ID=${req.user.id}
+	`;
+
+	db.query(query, (err, result) => {
+		if (err) return next(err);
+
+		// check result array has one element
+		if (result.length === 0)
+			return next(
+				new ErrorResponse('Oops! Something went wrong with your request.', 404)
+			);
+
+		// Add edu_cred to request for checking incoming Fields
+		req.edu_cred = result[0];
+		next();
+	});
+};

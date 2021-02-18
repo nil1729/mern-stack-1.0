@@ -79,6 +79,8 @@ exports.getProfile = (user_id, fields, res, next) => {
 		WHERE USERS.ID = ${user_id};
 	`;
 
+	let user_profile, user_job_experiences, user_education_credits;
+
 	// execute the query
 	db.query(query, (err, result) => {
 		if (err) return next(err);
@@ -90,7 +92,7 @@ exports.getProfile = (user_id, fields, res, next) => {
 					404
 				)
 			);
-		let user_profile = result[0];
+		user_profile = result[0];
 
 		// Create string for select fields
 		queryFields = ``;
@@ -106,14 +108,37 @@ exports.getProfile = (user_id, fields, res, next) => {
 		`;
 
 		// execute the query
-		db.query(query, (err, results) => {
+		db.query(query, (err, jobResults) => {
 			if (err) return next(err);
 
-			// Send responses to client
-			return res.status(200).json({
-				success: true,
-				user_profile,
-				user_job_experiences: results,
+			user_job_experiences = jobResults;
+
+			// Create string for select fields
+			queryFields = ``;
+			fields.publicEduFields.forEach((field) => (queryFields += `${field},`));
+			queryFields = queryFields.slice(0, -1);
+
+			// Create query for getting user profile details
+			query = `
+				SELECT 
+					${queryFields}
+				FROM USER_EDUCATIONS
+				WHERE USER_ID = ${user_id};
+			`;
+
+			// execute the query
+			db.query(query, (err, eduResults) => {
+				if (err) return next(err);
+
+				user_education_credits = eduResults;
+
+				// Send responses to client
+				return res.status(200).json({
+					success: true,
+					user_profile,
+					user_job_experiences,
+					user_education_credits,
+				});
 			});
 		});
 	});
@@ -187,6 +212,78 @@ exports.deleteExperience = (user_id, job_exp_id, res, next) => {
 		return res.status(200).json({
 			success: true,
 			message: 'Job experience deleted',
+		});
+	});
+};
+
+exports.addEducation = (data, res, next) => {
+	// Create query for SQL
+	let fields = ``;
+	let values = ``;
+	data.incomingFields.forEach((key) => {
+		fields += `${key},`;
+		values += `"${data.body[key]}",`;
+	});
+	fields += `user_id`;
+	values += `${data.user.id}`;
+
+	let query = `
+        INSERT INTO USER_EDUCATIONS(${fields})
+            VALUES(${values});
+    `;
+
+	// execute the query
+	db.query(query, (err) => {
+		if (err) return next(err);
+
+		// Send responses to client
+		return res.status(201).json({
+			success: true,
+			message: 'Education credential added to your profile',
+		});
+	});
+};
+
+exports.updateEducation = (data, res, next) => {
+	// Create query for SQL
+	let setQuery = ``;
+
+	data.incomingFields.forEach((key) => {
+		setQuery += `${key}="${data.body[key]}",`;
+	});
+
+	// remove the last comma from the query string
+	setQuery = setQuery.slice(0, -1);
+
+	let query = `
+		UPDATE USER_EDUCATIONS SET ${setQuery} WHERE USER_ID = ${data.user.id} AND ID = ${data.edu_cred.id};
+	`;
+
+	// execute the query
+	db.query(query, (err, result) => {
+		if (err) return next(err);
+
+		// Send responses to client
+		return res.status(200).json({
+			success: true,
+			message: 'Education credential updated successfully',
+		});
+	});
+};
+
+exports.deleteEducation = (user_id, edu_cred_id, res, next) => {
+	let query = `
+		DELETE FROM USER_EDUCATIONS WHERE USER_ID = ${user_id} AND ID = ${edu_cred_id};
+	`;
+
+	// execute the query
+	db.query(query, (err) => {
+		if (err) return next(err);
+
+		// Send responses to client
+		return res.status(200).json({
+			success: true,
+			message: 'Education credential deleted',
 		});
 	});
 };

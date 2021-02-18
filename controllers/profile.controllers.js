@@ -9,6 +9,9 @@ const asyncHandler = require('../middleware/asyncHandler'),
 		addExperience,
 		updateExperience,
 		deleteExperience,
+		addEducation,
+		updateEducation,
+		deleteEducation,
 	} = require('../services/profile.services');
 
 /**
@@ -87,16 +90,24 @@ exports.profileHandler = (req, res, next) => {
 			'ending_date',
 		];
 		let publicJobFields = ['job_title', 'company_name'];
+		let privateEduFields = [
+			'program_description',
+			'field_of_study',
+			'starting_date',
+			'ending_date',
+		];
+		let publicEduFields = ['school_name', 'degree'];
 
 		// If user is authenticated make all fields public
 		if (req.user) {
 			publicUserFields.push(...privateUserFields);
 			publicJobFields.push(...privateJobFields);
+			publicEduFields.push(...privateEduFields);
 		}
 		// Call Get profile Service
 		getProfile(
 			req.params.user_id,
-			{ publicUserFields, publicJobFields },
+			{ publicUserFields, publicJobFields, publicEduFields },
 			res,
 			next
 		);
@@ -205,6 +216,13 @@ exports.addExperience = (req, res, next) => {
 	addExperience(data, res, next);
 };
 
+/**
+ *
+ * @desc User experience edit/delete Handler
+ * @route /api/v1/user/:id/profile/experience/:exp_id
+ * @access private
+ *
+ */
 exports.experienceHandler = (req, res, next) => {
 	if (req.method === 'PUT') {
 		let requiredFields = ['job_title', 'company_name'];
@@ -212,7 +230,9 @@ exports.experienceHandler = (req, res, next) => {
 		let errors = [];
 
 		if (incomingFields.length === 0)
-			next(new ErrorResponse(`Invalid request for update job experience`, 403));
+			return next(
+				new ErrorResponse(`Invalid request for update job experience`, 403)
+			);
 
 		for (let i = 0; i < incomingFields.length; i++) {
 			// Check if update any required fields to be updated correctly
@@ -241,7 +261,9 @@ exports.experienceHandler = (req, res, next) => {
 		}
 
 		if (errors.length > 0)
-			next(new ErrorResponse('Please provide valid Date(s)', 400, errors));
+			return next(
+				new ErrorResponse('Please provide valid Date(s)', 400, errors)
+			);
 
 		// if job description added
 		if (req.body.job_description)
@@ -261,4 +283,137 @@ exports.experienceHandler = (req, res, next) => {
 		deleteExperience(req.user.id, req.job_exp.id, res, next);
 	else
 		next(new ErrorResponse('Requested address not found on this server', 400));
+};
+
+/**
+ *
+ * @desc User education add Handler
+ * @route /api/v1/user/:id/profile/education
+ * @access private
+ *
+ */
+
+exports.addEducation = (req, res, next) => {
+	// If new user directly reject
+	if (req.user.new_account)
+		return next(
+			new ErrorResponse('Please first create your developer profile', 403)
+		);
+
+	let requiredFields = ['school_name', 'degree'];
+	let incomingFields = Object.keys(req.body);
+	let errors = [];
+
+	// Checking for required fields
+	for (let i = 0; i < requiredFields.length; i++) {
+		if (
+			!req.body[requiredFields[i]] ||
+			(req.body[requiredFields[i]] &&
+				req.body[requiredFields[i]].trim().length === 0)
+		)
+			return next(new ErrorResponse('Please add all required fields', 400));
+	}
+
+	// Checking for starting_date and ending_date
+	let { starting_date, ending_date } = req.body;
+	if (starting_date) {
+		if (!checker.checkDate(starting_date, 'smaller', new Date()))
+			errors.push('Please correctly mention the starting_date');
+	}
+	if (ending_date) {
+		if (!checker.checkDate(ending_date, 'greater', starting_date))
+			errors.push('Please correctly mention the ending_date');
+	}
+	if (errors.length > 0)
+		next(new ErrorResponse('Please provide valid Date(s)', 400, errors));
+
+	// if program description added
+	if (req.body.program_description)
+		req.body.program_description = xss(req.body.program_description);
+
+	// proceed further
+	let data = {
+		incomingFields,
+		body: req.body,
+		user: req.user,
+	};
+
+	// call add experience service
+	addEducation(data, res, next);
+};
+
+/**
+ *
+ * @desc User education edit/delete Handler
+ * @route /api/v1/user/:id/profile/experience/:exp_id
+ * @access private
+ *
+ */
+exports.educationHandler = (req, res, next) => {
+	if (req.method === 'PUT') {
+		let requiredFields = ['school_name', 'degree'];
+		let incomingFields = Object.keys(req.body);
+		let errors = [];
+
+		if (incomingFields.length === 0)
+			return next(
+				new ErrorResponse(
+					`Invalid request for update education credential`,
+					403
+				)
+			);
+
+		for (let i = 0; i < incomingFields.length; i++) {
+			// Check if update any required fields to be updated correctly
+			if (
+				requiredFields.includes(incomingFields[i]) &&
+				(!req.body[requiredFields[i]] ||
+					(req.body[requiredFields[i]] &&
+						req.body[requiredFields[i]].trim().length === 0))
+			)
+				return next(
+					new ErrorResponse('Please add all required fields correctly', 400)
+				);
+		}
+		// Checking for starting_date and ending_date
+		let { starting_date, ending_date } = req.body;
+		if (starting_date) {
+			if (!checker.checkDate(starting_date, 'smaller', new Date()))
+				errors.push('Please correctly mention the starting_date');
+			if (ending_date) {
+				if (!checker.checkDate(ending_date, 'greater', starting_date))
+					errors.push('Please correctly mention the ending_date');
+			}
+		} else if (ending_date) {
+			if (
+				!checker.checkDate(ending_date, 'greater', req.edu_cred.starting_date)
+			)
+				errors.push('Please correctly mention the ending_date');
+		}
+
+		if (errors.length > 0)
+			return next(
+				new ErrorResponse('Please provide valid Date(s)', 400, errors)
+			);
+
+		// if program description added
+		if (req.body.program_description)
+			req.body.program_description = xss(req.body.program_description);
+
+		// proceed further
+		let data = {
+			incomingFields,
+			body: req.body,
+			user: req.user,
+			edu_cred: req.edu_cred,
+		};
+
+		// call update Education service
+		updateEducation(data, res, next);
+	} else if (req.method === 'DELETE')
+		deleteEducation(req.user.id, req.edu_cred.id, res, next);
+	else
+		return next(
+			new ErrorResponse('Requested address not found on this server', 400)
+		);
 };
