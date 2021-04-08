@@ -1,6 +1,7 @@
 const express = require('express'),
 	router = express.Router({ mergeParams: true }),
 	{
+		getPostsHandler,
 		addPostHandler,
 		updatePostHandler,
 		deletePostHandler,
@@ -17,40 +18,21 @@ const express = require('express'),
 
 router
 	.route('/')
+	.get(checkAuthentication, getPostsHandler)
 	.post(checkAuthentication, addPostHandler);
 
 router
 	.route('/:post_id')
-	.put(
-		checkAuthentication,
-		postAuthorize,
-		updatePostHandler
-	)
-	.delete(
-		checkAuthentication,
-		postAuthorize,
-		deletePostHandler
-	);
+	.put(checkAuthentication, postAuthorize, updatePostHandler)
+	.delete(checkAuthentication, postAuthorize, deletePostHandler);
 
-router
-	.route('/:post_id/comments')
-	.post(checkAuthentication, addCommentHandler);
+router.route('/:post_id/comments').post(checkAuthentication, addCommentHandler);
 
 router
 	.route('/:post_id/comments/:comment_id')
-	.put(
-		checkAuthentication,
-		postCommentAuthorize,
-		updateCommentHandler
-	)
-	.delete(
-		checkAuthentication,
-		postCommentAuthorize,
-		deleteCommentHandler
-	);
+	.put(checkAuthentication, postCommentAuthorize, updateCommentHandler)
+	.delete(checkAuthentication, postCommentAuthorize, deleteCommentHandler);
 
-router
-	.route('/:post_id/reactions')
-	.post(checkAuthentication, reactionHandler);
+router.route('/:post_id/reactions').post(checkAuthentication, reactionHandler);
 
 module.exports = router;

@@ -86,12 +86,7 @@ exports.getProfile = (user_id, fields, res, next) => {
 		if (err) return next(err);
 
 		if (result.length < 1)
-			return next(
-				new ErrorResponse(
-					"We look into our records. But didn't find any user",
-					404
-				)
-			);
+			return next(new ErrorResponse("We look into our records. But didn't find any user", 404));
 		user_profile = result[0];
 
 		// Create string for select fields

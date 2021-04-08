@@ -1,5 +1,3 @@
-const ErrorResponse = require('../utils/errorResponse');
-
 exports.addPost = (data, res, next) => {
 	let query = `
         INSERT INTO POSTS(body, user_id)
@@ -12,8 +10,7 @@ exports.addPost = (data, res, next) => {
 
 		res.status(201).json({
 			success: true,
-			message:
-				'Your new post added to your account',
+			message: 'Your new post added to your account',
 		});
 	});
 };
@@ -66,20 +63,13 @@ exports.updateComment = (data, res, next) => {
 
 		res.status(200).json({
 			success: true,
-			message:
-				'Your comment updated successfully',
+			message: 'Your comment updated successfully',
 		});
 	});
 };
 
 // add reaction
-exports.addReaction = (
-	reaction,
-	post_id,
-	user_id,
-	res,
-	next
-) => {
+exports.addReaction = (reaction, post_id, user_id, res, next) => {
 	let query = `
         INSERT INTO POST_REACTIONS(reaction, user_id, post_id)
             VALUES(${reaction}, ${user_id}, ${post_id});
@@ -97,13 +87,7 @@ exports.addReaction = (
 };
 
 //update reaction
-exports.updateReaction = (
-	reaction,
-	post_id,
-	user_id,
-	res,
-	next
-) => {
+exports.updateReaction = (reaction, post_id, user_id, res, next) => {
 	let query = `
         UPDATE POST_REACTIONS SET reaction = ${reaction} 
 			WHERE user_id = ${user_id} &&
@@ -116,19 +100,13 @@ exports.updateReaction = (
 
 		res.status(200).json({
 			success: true,
-			message:
-				'Your reaction updated successfully',
+			message: 'Your reaction updated successfully',
 		});
 	});
 };
 
 //delete reaction
-exports.deleteReaction = (
-	post_id,
-	user_id,
-	res,
-	next
-) => {
+exports.deleteReaction = (post_id, user_id, res, next) => {
 	let query = `
         DELETE FROM POST_REACTIONS 
 			WHERE user_id = ${user_id} &&
@@ -141,8 +119,7 @@ exports.deleteReaction = (
 
 		res.status(200).json({
 			success: true,
-			message:
-				'Your reaction deleted successfully',
+			message: 'Your reaction deleted successfully',
 		});
 	});
 };

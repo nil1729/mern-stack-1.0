@@ -23,12 +23,7 @@ exports.addPostHandler = (req, res, next) => {
 	// Checking for body
 	let { body } = req.body;
 	if (!body || body.trim().length === 0)
-		return next(
-			new ErrorResponse(
-				'Please add some texts to create a new post',
-				400
-			)
-		);
+		return next(new ErrorResponse('Please add some texts to create a new post', 400));
 
 	// Filter the body for XSS Protection
 	body = xss(body);
@@ -45,12 +40,7 @@ exports.addPostHandler = (req, res, next) => {
 		if (err) return next(err);
 
 		if (results[0].duplicatePost > 0) {
-			return next(
-				new ErrorResponse(
-					'The Post you trying to add is already exists',
-					400
-				)
-			);
+			return next(new ErrorResponse('The Post you trying to add is already exists', 400));
 		}
 
 		// Call Add Post Service
@@ -62,12 +52,7 @@ exports.updatePostHandler = (req, res, next) => {
 	// Checking for body
 	let { body } = req.body;
 	if (!body || body.trim().length === 0)
-		return next(
-			new ErrorResponse(
-				'Please add some texts to update the post',
-				400
-			)
-		);
+		return next(new ErrorResponse('Please add some texts to update the post', 400));
 
 	// Filter the body for XSS Protection
 	body = xss(body);
@@ -84,16 +69,8 @@ exports.updatePostHandler = (req, res, next) => {
 		if (err) return next(err);
 
 		// Duplicate checking
-		if (
-			results.length > 0 &&
-			results[0].post_id !== req.post.id
-		) {
-			return next(
-				new ErrorResponse(
-					'The Post you trying to add is already exists',
-					400
-				)
-			);
+		if (results.length > 0 && results[0].post_id !== req.post.id) {
+			return next(new ErrorResponse('The Post you trying to add is already exists', 400));
 		}
 
 		// Call Add Post Service
@@ -132,12 +109,7 @@ exports.addCommentHandler = (req, res, next) => {
 	// Checking for body
 	let { body } = req.body;
 	if (!body || body.trim().length === 0)
-		return next(
-			new ErrorResponse(
-				'Please add some texts to add a comment',
-				400
-			)
-		);
+		return next(new ErrorResponse('Please add some texts to add a comment', 400));
 
 	// Filter the body for XSS Protection
 	body = xss(body);
@@ -153,12 +125,7 @@ exports.addCommentHandler = (req, res, next) => {
 		if (err) return next(err);
 
 		if (results[0].postCount === 0) {
-			return next(
-				new ErrorResponse(
-					'Oops! requested post not found',
-					400
-				)
-			);
+			return next(new ErrorResponse('Oops! requested post not found', 400));
 		}
 
 		// Checking For Duplicates
@@ -175,10 +142,7 @@ exports.addCommentHandler = (req, res, next) => {
 
 			if (results[0].duplicateComment > 0) {
 				return next(
-					new ErrorResponse(
-						'This comment is already exists for this post commented by you',
-						400
-					)
+					new ErrorResponse('This comment is already exists for this post commented by you', 400)
 				);
 			}
 
@@ -196,20 +160,11 @@ exports.addCommentHandler = (req, res, next) => {
 	});
 };
 
-exports.updateCommentHandler = (
-	req,
-	res,
-	next
-) => {
+exports.updateCommentHandler = (req, res, next) => {
 	// Checking for body
 	let { body } = req.body;
 	if (!body || body.trim().length === 0)
-		return next(
-			new ErrorResponse(
-				'Please add some texts to update your comment',
-				400
-			)
-		);
+		return next(new ErrorResponse('Please add some texts to update your comment', 400));
 
 	// Filter the body for XSS Protection
 	body = xss(body);
@@ -227,16 +182,9 @@ exports.updateCommentHandler = (
 		if (err) return next(err);
 
 		// Duplicate checking
-		if (
-			results.length > 0 &&
-			results[0].comment_id !==
-				req.post_comment.id
-		) {
+		if (results.length > 0 && results[0].comment_id !== req.post_comment.id) {
 			return next(
-				new ErrorResponse(
-					'This comment is already exists for this post commented by you',
-					400
-				)
+				new ErrorResponse('This comment is already exists for this post commented by you', 400)
 			);
 		}
 
@@ -252,11 +200,7 @@ exports.updateCommentHandler = (
 	});
 };
 
-exports.deleteCommentHandler = (
-	req,
-	res,
-	next
-) => {
+exports.deleteCommentHandler = (req, res, next) => {
 	// Checking For Duplicates
 	let query = `
         DELETE FROM POST_COMMENTS
@@ -271,8 +215,7 @@ exports.deleteCommentHandler = (
 		// Send responses to client
 		res.status(201).json({
 			success: true,
-			message:
-				'Your comment deleted successfully',
+			message: 'Your comment deleted successfully',
 		});
 	});
 };
@@ -289,12 +232,7 @@ exports.reactionHandler = (req, res, next) => {
 		if (err) return next(err);
 
 		if (results[0].postCount === 0) {
-			return next(
-				new ErrorResponse(
-					'Oops! requested post not found',
-					400
-				)
-			);
+			return next(new ErrorResponse('Oops! requested post not found', 400));
 		}
 
 		// check for reactions
@@ -305,53 +243,53 @@ exports.reactionHandler = (req, res, next) => {
 					user_id = ${req.user.id};
 		`;
 
-		if (
-			req.body &&
-			typeof req.body.reaction !== 'boolean'
-		)
-			return next(
-				new ErrorResponse(
-					'Invalid reaction type',
-					400
-				)
-			);
+		if (req.body && typeof req.body.reaction !== 'boolean')
+			return next(new ErrorResponse('Invalid reaction type', 400));
 
-		let currentReaction = req.body.reaction
-			? 1
-			: 0;
+		let currentReaction = req.body.reaction ? 1 : 0;
 
 		db.query(query, (err, results) => {
 			if (err) return next(err);
 
 			if (results.length === 0) {
 				// add new reaction
-				addReaction(
-					currentReaction,
-					req.params.post_id,
-					req.user.id,
-					res,
-					next
-				);
-			} else if (
-				results[0].reaction === currentReaction
-			) {
+				addReaction(currentReaction, req.params.post_id, req.user.id, res, next);
+			} else if (results[0].reaction === currentReaction) {
 				// delete
-				deleteReaction(
-					req.params.post_id,
-					req.user.id,
-					res,
-					next
-				);
+				deleteReaction(req.params.post_id, req.user.id, res, next);
 			} else {
 				// update
-				updateReaction(
-					currentReaction,
-					req.params.post_id,
-					req.user.id,
-					res,
-					next
-				);
+				updateReaction(currentReaction, req.params.post_id, req.user.id, res, next);
 			}
+		});
+	});
+};
+
+exports.getPostsHandler = (req, res, next) => {
+	let requestedUserID = req.user ? req.user.id : null;
+
+	let query = `
+		select 
+			concat(substr(p.body, 1, 100), "....") as body, 
+			p.id, p.user_id, p.created_at, 
+			up.github_username, u.name,
+			r.reaction,
+			count(c.id) as comments
+			from posts p
+			inner join user_profiles up on p.user_id = up.user_id
+			inner join users u on u.id = p.user_id
+			left join post_comments c on c.post_id = p.id
+			left join post_reactions r on r.post_id = p.id && r.user_id = ${requestedUserID} 
+			group by p.id;
+		`;
+
+	db.query(query, (err, results) => {
+		if (err) return next(err);
+
+		// Send responses to client
+		res.status(200).json({
+			success: true,
+			results: results,
 		});
 	});
 };

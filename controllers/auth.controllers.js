@@ -20,12 +20,7 @@ exports.registerHandler = (req, res, next) => {
 	// Check for Valid inputs
 	name = name.replace(/\s{2,}/g, ' ');
 	if (!checker.alphabetic(name)) {
-		next(
-			new ErrorResponse(
-				'Please provide a Name with only alphabetic characters',
-				400
-			)
-		);
+		next(new ErrorResponse('Please provide a Name with only alphabetic characters', 400));
 	}
 	if (!checker.email(email)) {
 		next(new ErrorResponse('Please provide a valid email address', 400));

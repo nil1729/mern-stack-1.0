@@ -1,10 +1,6 @@
 const express = require('express'),
 	router = express.Router(),
-	{
-		registerHandler,
-		loginHandler,
-		userHandler,
-	} = require('../controllers/auth.controllers'),
+	{ registerHandler, loginHandler, userHandler } = require('../controllers/auth.controllers'),
 	{ checkAuthentication } = require('../middleware/auth.middleware');
 
 router.route('/register').post(registerHandler);

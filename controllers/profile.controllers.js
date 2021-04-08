@@ -22,63 +22,26 @@ const ErrorResponse = require('../utils/errorResponse'),
  */
 
 exports.profileHandler = (req, res, next) => {
-	if (
-		req.method === 'POST' &&
-		req.user.new_account
-	) {
-		let requiredFields = [
-			'current_position',
-			'current_working_place_name',
-			'skills',
-		];
+	if (req.method === 'POST' && req.user.new_account) {
+		let requiredFields = ['current_position', 'current_working_place_name', 'skills'];
 		let incomingFields = Object.keys(req.body);
 		let errors = [];
 
-		for (
-			let i = 0;
-			i < requiredFields.length;
-			i++
-		) {
+		for (let i = 0; i < requiredFields.length; i++) {
 			if (
 				!req.body[requiredFields[i]] ||
-				(req.body[requiredFields[i]] &&
-					req.body[requiredFields[i]].trim()
-						.length === 0)
+				(req.body[requiredFields[i]] && req.body[requiredFields[i]].trim().length === 0)
 			)
-				return next(
-					new ErrorResponse(
-						'Please add all required fields',
-						400
-					)
-				);
+				return next(new ErrorResponse('Please add all required fields', 400));
 		}
-		for (
-			let i = 0;
-			i < incomingFields.length;
-			i++
-		) {
-			if (
-				incomingFields[i].endsWith('_url') &&
-				!checker.siteURL(
-					req.body[incomingFields[i]]
-				)
-			) {
-				errors.push(
-					`${incomingFields[i]} is not a valid URL`
-				);
+		for (let i = 0; i < incomingFields.length; i++) {
+			if (incomingFields[i].endsWith('_url') && !checker.siteURL(req.body[incomingFields[i]])) {
+				errors.push(`${incomingFields[i]} is not a valid URL`);
 			}
 		}
-		if (errors.length > 0)
-			next(
-				new ErrorResponse(
-					'Please provide valid URL(s)',
-					400,
-					errors
-				)
-			);
+		if (errors.length > 0) next(new ErrorResponse('Please provide valid URL(s)', 400, errors));
 
-		if (req.body.bio)
-			req.body.bio = xss(req.body.bio);
+		if (req.body.bio) req.body.bio = xss(req.body.bio);
 
 		// proceed further
 		let data = {
@@ -110,26 +73,15 @@ exports.profileHandler = (req, res, next) => {
 			'twitter_url',
 			'youtube_channel_url',
 		];
-		let privateJobFields = [
-			'location',
-			'job_description',
-			'starting_date',
-			'ending_date',
-		];
-		let publicJobFields = [
-			'job_title',
-			'company_name',
-		];
+		let privateJobFields = ['location', 'job_description', 'starting_date', 'ending_date'];
+		let publicJobFields = ['job_title', 'company_name'];
 		let privateEduFields = [
 			'program_description',
 			'field_of_study',
 			'starting_date',
 			'ending_date',
 		];
-		let publicEduFields = [
-			'school_name',
-			'degree',
-		];
+		let publicEduFields = ['school_name', 'degree'];
 
 		// If user is authenticated make all fields public
 		if (req.user) {
@@ -148,71 +100,31 @@ exports.profileHandler = (req, res, next) => {
 			res,
 			next
 		);
-	} else if (
-		req.method === 'PUT' &&
-		!req.user.new_account
-	) {
-		let requiredFields = [
-			'current_position',
-			'current_working_place_name',
-			'skills',
-		];
+	} else if (req.method === 'PUT' && !req.user.new_account) {
+		let requiredFields = ['current_position', 'current_working_place_name', 'skills'];
 		let incomingFields = Object.keys(req.body);
 		let errors = [];
 
 		if (incomingFields.length === 0)
-			next(
-				new ErrorResponse(
-					`Invalid request for update profile`,
-					403
-				)
-			);
+			next(new ErrorResponse(`Invalid request for update profile`, 403));
 
-		for (
-			let i = 0;
-			i < incomingFields.length;
-			i++
-		) {
+		for (let i = 0; i < incomingFields.length; i++) {
 			// Check if update any required fields to be updated correctly
 			if (
-				requiredFields.includes(
-					incomingFields[i]
-				) &&
+				requiredFields.includes(incomingFields[i]) &&
 				(!req.body[requiredFields[i]] ||
-					(req.body[requiredFields[i]] &&
-						req.body[requiredFields[i]].trim()
-							.length === 0))
+					(req.body[requiredFields[i]] && req.body[requiredFields[i]].trim().length === 0))
 			)
-				return next(
-					new ErrorResponse(
-						'Please add all required fields',
-						400
-					)
-				);
+				return next(new ErrorResponse('Please add all required fields', 400));
 
 			// Checking for URL updates
-			if (
-				incomingFields[i].endsWith('_url') &&
-				!checker.siteURL(
-					req.body[incomingFields[i]]
-				)
-			) {
-				errors.push(
-					`${incomingFields[i]} is not a valid URL`
-				);
+			if (incomingFields[i].endsWith('_url') && !checker.siteURL(req.body[incomingFields[i]])) {
+				errors.push(`${incomingFields[i]} is not a valid URL`);
 			}
 		}
-		if (errors.length > 0)
-			next(
-				new ErrorResponse(
-					'Please provide valid URL(s)',
-					400,
-					errors
-				)
-			);
+		if (errors.length > 0) next(new ErrorResponse('Please provide valid URL(s)', 400, errors));
 
-		if (req.body.bio)
-			req.body.bio = xss(req.body.bio);
+		if (req.body.bio) req.body.bio = xss(req.body.bio);
 
 		// proceed further
 		let data = {
@@ -223,13 +135,7 @@ exports.profileHandler = (req, res, next) => {
 
 		// call update profile service
 		updateProfile(data, res, next);
-	} else
-		next(
-			new ErrorResponse(
-				'Requested address not found on this server',
-				400
-			)
-		);
+	} else next(new ErrorResponse('Requested address not found on this server', 400));
 };
 
 /**
@@ -243,80 +149,35 @@ exports.profileHandler = (req, res, next) => {
 exports.addExperience = (req, res, next) => {
 	// If new user directly reject
 	if (req.user.new_account)
-		return next(
-			new ErrorResponse(
-				'Please first create your developer profile',
-				403
-			)
-		);
+		return next(new ErrorResponse('Please first create your developer profile', 403));
 
-	let requiredFields = [
-		'job_title',
-		'company_name',
-	];
+	let requiredFields = ['job_title', 'company_name'];
 	let incomingFields = Object.keys(req.body);
 	let errors = [];
 
 	// Checking for required fields
-	for (
-		let i = 0;
-		i < requiredFields.length;
-		i++
-	) {
+	for (let i = 0; i < requiredFields.length; i++) {
 		if (
 			!req.body[requiredFields[i]] ||
-			(req.body[requiredFields[i]] &&
-				req.body[requiredFields[i]].trim()
-					.length === 0)
+			(req.body[requiredFields[i]] && req.body[requiredFields[i]].trim().length === 0)
 		)
-			return next(
-				new ErrorResponse(
-					'Please add all required fields',
-					400
-				)
-			);
+			return next(new ErrorResponse('Please add all required fields', 400));
 	}
 
 	// Checking for starting_date and ending_date
 	let { starting_date, ending_date } = req.body;
 	if (starting_date) {
-		if (
-			!checker.checkDate(
-				starting_date,
-				'smaller',
-				new Date()
-			)
-		)
-			errors.push(
-				'Please correctly mention the starting_date'
-			);
+		if (!checker.checkDate(starting_date, 'smaller', new Date()))
+			errors.push('Please correctly mention the starting_date');
 	}
 	if (ending_date) {
-		if (
-			!checker.checkDate(
-				ending_date,
-				'greater',
-				starting_date
-			)
-		)
-			errors.push(
-				'Please correctly mention the ending_date'
-			);
+		if (!checker.checkDate(ending_date, 'greater', starting_date))
+			errors.push('Please correctly mention the ending_date');
 	}
-	if (errors.length > 0)
-		next(
-			new ErrorResponse(
-				'Please provide valid Date(s)',
-				400,
-				errors
-			)
-		);
+	if (errors.length > 0) next(new ErrorResponse('Please provide valid Date(s)', 400, errors));
 
 	// if job description added
-	if (req.body.job_description)
-		req.body.job_description = xss(
-			req.body.job_description
-		);
+	if (req.body.job_description) req.body.job_description = xss(req.body.job_description);
 
 	// proceed further
 	let data = {
@@ -338,95 +199,41 @@ exports.addExperience = (req, res, next) => {
  */
 exports.experienceHandler = (req, res, next) => {
 	if (req.method === 'PUT') {
-		let requiredFields = [
-			'job_title',
-			'company_name',
-		];
+		let requiredFields = ['job_title', 'company_name'];
 		let incomingFields = Object.keys(req.body);
 		let errors = [];
 
 		if (incomingFields.length === 0)
-			return next(
-				new ErrorResponse(
-					`Invalid request for update job experience`,
-					403
-				)
-			);
+			return next(new ErrorResponse(`Invalid request for update job experience`, 403));
 
-		for (
-			let i = 0;
-			i < incomingFields.length;
-			i++
-		) {
+		for (let i = 0; i < incomingFields.length; i++) {
 			// Check if update any required fields to be updated correctly
 			if (
-				requiredFields.includes(
-					incomingFields[i]
-				) &&
+				requiredFields.includes(incomingFields[i]) &&
 				(!req.body[requiredFields[i]] ||
-					(req.body[requiredFields[i]] &&
-						req.body[requiredFields[i]].trim()
-							.length === 0))
+					(req.body[requiredFields[i]] && req.body[requiredFields[i]].trim().length === 0))
 			)
-				return next(
-					new ErrorResponse(
-						'Please add all required fields correctly',
-						400
-					)
-				);
+				return next(new ErrorResponse('Please add all required fields correctly', 400));
 		}
 		// Checking for starting_date and ending_date
 		let { starting_date, ending_date } = req.body;
 		if (starting_date) {
-			if (
-				!checker.checkDate(
-					starting_date,
-					'smaller',
-					new Date()
-				)
-			)
-				errors.push(
-					'Please correctly mention the starting_date'
-				);
+			if (!checker.checkDate(starting_date, 'smaller', new Date()))
+				errors.push('Please correctly mention the starting_date');
 			if (ending_date) {
-				if (
-					!checker.checkDate(
-						ending_date,
-						'greater',
-						starting_date
-					)
-				)
-					errors.push(
-						'Please correctly mention the ending_date'
-					);
+				if (!checker.checkDate(ending_date, 'greater', starting_date))
+					errors.push('Please correctly mention the ending_date');
 			}
 		} else if (ending_date) {
-			if (
-				!checker.checkDate(
-					ending_date,
-					'greater',
-					req.job_exp.starting_date
-				)
-			)
-				errors.push(
-					'Please correctly mention the ending_date'
-				);
+			if (!checker.checkDate(ending_date, 'greater', req.job_exp.starting_date))
+				errors.push('Please correctly mention the ending_date');
 		}
 
 		if (errors.length > 0)
-			return next(
-				new ErrorResponse(
-					'Please provide valid Date(s)',
-					400,
-					errors
-				)
-			);
+			return next(new ErrorResponse('Please provide valid Date(s)', 400, errors));
 
 		// if job description added
-		if (req.body.job_description)
-			req.body.job_description = xss(
-				req.body.job_description
-			);
+		if (req.body.job_description) req.body.job_description = xss(req.body.job_description);
 
 		// proceed further
 		let data = {
@@ -438,20 +245,8 @@ exports.experienceHandler = (req, res, next) => {
 
 		// call update Job Experience service
 		updateExperience(data, res, next);
-	} else if (req.method === 'DELETE')
-		deleteExperience(
-			req.user.id,
-			req.job_exp.id,
-			res,
-			next
-		);
-	else
-		next(
-			new ErrorResponse(
-				'Requested address not found on this server',
-				400
-			)
-		);
+	} else if (req.method === 'DELETE') deleteExperience(req.user.id, req.job_exp.id, res, next);
+	else next(new ErrorResponse('Requested address not found on this server', 400));
 };
 
 /**
@@ -465,77 +260,36 @@ exports.experienceHandler = (req, res, next) => {
 exports.addEducation = (req, res, next) => {
 	// If new user directly reject
 	if (req.user.new_account)
-		return next(
-			new ErrorResponse(
-				'Please first create your developer profile',
-				403
-			)
-		);
+		return next(new ErrorResponse('Please first create your developer profile', 403));
 
 	let requiredFields = ['school_name', 'degree'];
 	let incomingFields = Object.keys(req.body);
 	let errors = [];
 
 	// Checking for required fields
-	for (
-		let i = 0;
-		i < requiredFields.length;
-		i++
-	) {
+	for (let i = 0; i < requiredFields.length; i++) {
 		if (
 			!req.body[requiredFields[i]] ||
-			(req.body[requiredFields[i]] &&
-				req.body[requiredFields[i]].trim()
-					.length === 0)
+			(req.body[requiredFields[i]] && req.body[requiredFields[i]].trim().length === 0)
 		)
-			return next(
-				new ErrorResponse(
-					'Please add all required fields',
-					400
-				)
-			);
+			return next(new ErrorResponse('Please add all required fields', 400));
 	}
 
 	// Checking for starting_date and ending_date
 	let { starting_date, ending_date } = req.body;
 	if (starting_date) {
-		if (
-			!checker.checkDate(
-				starting_date,
-				'smaller',
-				new Date()
-			)
-		)
-			errors.push(
-				'Please correctly mention the starting_date'
-			);
+		if (!checker.checkDate(starting_date, 'smaller', new Date()))
+			errors.push('Please correctly mention the starting_date');
 	}
 	if (ending_date) {
-		if (
-			!checker.checkDate(
-				ending_date,
-				'greater',
-				starting_date
-			)
-		)
-			errors.push(
-				'Please correctly mention the ending_date'
-			);
+		if (!checker.checkDate(ending_date, 'greater', starting_date))
+			errors.push('Please correctly mention the ending_date');
 	}
-	if (errors.length > 0)
-		next(
-			new ErrorResponse(
-				'Please provide valid Date(s)',
-				400,
-				errors
-			)
-		);
+	if (errors.length > 0) next(new ErrorResponse('Please provide valid Date(s)', 400, errors));
 
 	// if program description added
 	if (req.body.program_description)
-		req.body.program_description = xss(
-			req.body.program_description
-		);
+		req.body.program_description = xss(req.body.program_description);
 
 	// proceed further
 	let data = {
@@ -557,95 +311,42 @@ exports.addEducation = (req, res, next) => {
  */
 exports.educationHandler = (req, res, next) => {
 	if (req.method === 'PUT') {
-		let requiredFields = [
-			'school_name',
-			'degree',
-		];
+		let requiredFields = ['school_name', 'degree'];
 		let incomingFields = Object.keys(req.body);
 		let errors = [];
 
 		if (incomingFields.length === 0)
-			return next(
-				new ErrorResponse(
-					`Invalid request for update education credential`,
-					403
-				)
-			);
+			return next(new ErrorResponse(`Invalid request for update education credential`, 403));
 
-		for (
-			let i = 0;
-			i < incomingFields.length;
-			i++
-		) {
+		for (let i = 0; i < incomingFields.length; i++) {
 			// Check if update any required fields to be updated correctly
 			if (
-				requiredFields.includes(
-					incomingFields[i]
-				) &&
+				requiredFields.includes(incomingFields[i]) &&
 				(!req.body[requiredFields[i]] ||
-					(req.body[requiredFields[i]] &&
-						req.body[requiredFields[i]].trim()
-							.length === 0))
+					(req.body[requiredFields[i]] && req.body[requiredFields[i]].trim().length === 0))
 			)
-				return next(
-					new ErrorResponse(
-						'Please add all required fields correctly',
-						400
-					)
-				);
+				return next(new ErrorResponse('Please add all required fields correctly', 400));
 		}
 		// Checking for starting_date and ending_date
 		let { starting_date, ending_date } = req.body;
 		if (starting_date) {
-			if (
-				!checker.checkDate(
-					starting_date,
-					'smaller',
-					new Date()
-				)
-			)
-				errors.push(
-					'Please correctly mention the starting_date'
-				);
+			if (!checker.checkDate(starting_date, 'smaller', new Date()))
+				errors.push('Please correctly mention the starting_date');
 			if (ending_date) {
-				if (
-					!checker.checkDate(
-						ending_date,
-						'greater',
-						starting_date
-					)
-				)
-					errors.push(
-						'Please correctly mention the ending_date'
-					);
+				if (!checker.checkDate(ending_date, 'greater', starting_date))
+					errors.push('Please correctly mention the ending_date');
 			}
 		} else if (ending_date) {
-			if (
-				!checker.checkDate(
-					ending_date,
-					'greater',
-					req.edu_cred.starting_date
-				)
-			)
-				errors.push(
-					'Please correctly mention the ending_date'
-				);
+			if (!checker.checkDate(ending_date, 'greater', req.edu_cred.starting_date))
+				errors.push('Please correctly mention the ending_date');
 		}
 
 		if (errors.length > 0)
-			return next(
-				new ErrorResponse(
-					'Please provide valid Date(s)',
-					400,
-					errors
-				)
-			);
+			return next(new ErrorResponse('Please provide valid Date(s)', 400, errors));
 
 		// if program description added
 		if (req.body.program_description)
-			req.body.program_description = xss(
-				req.body.program_description
-			);
+			req.body.program_description = xss(req.body.program_description);
 
 		// proceed further
 		let data = {
@@ -657,18 +358,6 @@ exports.educationHandler = (req, res, next) => {
 
 		// call update Education service
 		updateEducation(data, res, next);
-	} else if (req.method === 'DELETE')
-		deleteEducation(
-			req.user.id,
-			req.edu_cred.id,
-			res,
-			next
-		);
-	else
-		return next(
-			new ErrorResponse(
-				'Requested address not found on this server',
-				400
-			)
-		);
+	} else if (req.method === 'DELETE') deleteEducation(req.user.id, req.edu_cred.id, res, next);
+	else return next(new ErrorResponse('Requested address not found on this server', 400));
 };
