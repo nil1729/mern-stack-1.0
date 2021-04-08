@@ -4,13 +4,12 @@ if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 const express = require('express'),
 	mysql = require('mysql'),
 	cookieParser = require('cookie-parser'),
-	morgan = require('morgan');
-(app = express()),
-	(errorHandler = require('./middleware/errorHandler')),
-	(authRoutes = require('./routes/auth.routes')),
-	(userProfileRoutes = require('./routes/profile.routes')),
-	(postRoutes = require('./routes/post.routes')),
-	(developersRoute = require('./routes/dev.routes'));
+	app = express(),
+	errorHandler = require('./middleware/errorHandler'),
+	authRoutes = require('./routes/auth.routes'),
+	userProfileRoutes = require('./routes/profile.routes'),
+	postRoutes = require('./routes/post.routes'),
+	developersRoute = require('./routes/dev.routes');
 
 // Middleware read JSON Request Body
 app.use(express.json());
@@ -19,7 +18,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // use logger for development
-if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
+if (process.env.NODE_ENV !== 'production') app.use(require('morgan')('dev'));
 
 // Database Setup (Create Connection to Database)
 const db = mysql.createConnection({
