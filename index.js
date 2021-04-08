@@ -1,4 +1,5 @@
-if (process.env.NODE_ENV !== 'production') require('dotenv').config();
+if (process.env.NODE_ENV !== 'production')
+	require('dotenv').config();
 
 // Importing all necessary modules
 const express = require('express'),
@@ -8,7 +9,8 @@ const express = require('express'),
 (app = express()),
 	(errorHandler = require('./middleware/errorHandler')),
 	(authRoutes = require('./routes/auth.routes')),
-	(userProfileRoutes = require('./routes/profile.routes'));
+	(userProfileRoutes = require('./routes/profile.routes')),
+	(postRoutes = require('./routes/post.routes'));
 
 // Middleware read JSON Request Body
 app.use(express.json());
@@ -17,7 +19,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 // use logger for development
-if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
+if (process.env.NODE_ENV !== 'production')
+	app.use(morgan('dev'));
 
 // Database Setup (Create Connection to Database)
 const db = mysql.createConnection({
@@ -40,7 +43,11 @@ global.db = db;
 
 // Use API Routes
 app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/user/:user_id/profile', userProfileRoutes);
+app.use(
+	'/api/v1/user/:user_id/profile',
+	userProfileRoutes
+);
+app.use('/api/v1/posts', postRoutes);
 
 // Error Handler Middleware
 app.use(errorHandler);
@@ -58,7 +65,9 @@ process.on('unhandledRejection', (err) => {
 	// Closed the Server
 	server.close(() => {
 		db.end();
-		console.log('Server closed due to unhandled promise rejection');
+		console.log(
+			'Server closed due to unhandled promise rejection'
+		);
 		process.exit(1);
 	});
 });
