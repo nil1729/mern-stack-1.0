@@ -4,10 +4,15 @@ const express = require('express'),
 		addPostHandler,
 		updatePostHandler,
 		deletePostHandler,
+		addCommentHandler,
+		updateCommentHandler,
+		deleteCommentHandler,
+		reactionHandler,
 	} = require('../controllers/post.controllers'),
 	{
 		checkAuthentication,
 		postAuthorize,
+		postCommentAuthorize,
 	} = require('../middleware/auth.middleware');
 
 router
@@ -26,5 +31,26 @@ router
 		postAuthorize,
 		deletePostHandler
 	);
+
+router
+	.route('/:post_id/comments')
+	.post(checkAuthentication, addCommentHandler);
+
+router
+	.route('/:post_id/comments/:comment_id')
+	.put(
+		checkAuthentication,
+		postCommentAuthorize,
+		updateCommentHandler
+	)
+	.delete(
+		checkAuthentication,
+		postCommentAuthorize,
+		deleteCommentHandler
+	);
+
+router
+	.route('/:post_id/reactions')
+	.post(checkAuthentication, reactionHandler);
 
 module.exports = router;

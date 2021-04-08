@@ -255,3 +255,47 @@ exports.postAuthorize = (req, res, next) => {
 		next();
 	});
 };
+
+exports.postCommentAuthorize = (
+	req,
+	res,
+	next
+) => {
+	// If new user directly reject
+	if (req.user.new_account)
+		return next(
+			new ErrorResponse(
+				'Please first create your developer profile',
+				403
+			)
+		);
+
+	// Check user authorize the experience
+	let query = `
+		SELECT 
+			id,
+			user_id,
+			post_id
+		FROM POST_COMMENTS 
+		WHERE POST_ID=${req.params.post_id} && 
+			USER_ID=${req.user.id} &&
+			id=${req.params.comment_id}
+	`;
+
+	db.query(query, (err, result) => {
+		if (err) return next(err);
+
+		// check result array has one element
+		if (result.length === 0)
+			return next(
+				new ErrorResponse(
+					'Oops! Something went wrong with your request',
+					404
+				)
+			);
+
+		// Add post to request for checking incoming Fields
+		req.post_comment = result[0];
+		next();
+	});
+};
