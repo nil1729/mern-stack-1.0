@@ -55,12 +55,12 @@ exports.checkAuthentication = asyncHandler((req, res, next) => {
                     name, username, id,
 					verification_email_sent,
 					new_account,
-                    created_at, updated_at 
+                    created_at 
                     FROM USERS WHERE email_address = "${decodedToken.email}";
             `;
 
 		db.query(query, (err, result) => {
-			if (err) next(err);
+			if (err) return next(err);
 
 			// validate results
 			if (result.length === 0)

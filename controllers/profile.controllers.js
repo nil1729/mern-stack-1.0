@@ -63,7 +63,6 @@ exports.profileHandler = (req, res, next) => {
 		let publicUserFields = [
 			'name',
 			'username',
-			'users.id',
 			'current_position',
 			'current_working_place_name',
 			'skills',

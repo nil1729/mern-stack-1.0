@@ -11,9 +11,9 @@ router.get('/', checkAuthentication, (req, res, next) => {
 	if (req.user) queryFields += ',location';
 
 	let query = `
-        select ${queryFields}
-            from users u
-            inner join user_profiles up on u.id = up.user_id;
+        SELECT ${queryFields}
+            FROM USERS u
+			INNER JOIN USER_PROFILES up ON u.id = up.user_id;
     `;
 
 	db.query(query, (err, results) => {
