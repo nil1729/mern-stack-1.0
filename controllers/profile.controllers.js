@@ -15,6 +15,57 @@ const ErrorResponse = require('../utils/errorResponse'),
 
 /**
  *
+ * @desc Dashboard Profile handler
+ * @route GET /api/v1/user/:id/profile/dashboard
+ * @access private
+ *
+ */
+exports.getDashboardHandler = (req, res, next) => {
+	if (req.user.id !== req.params.user_id)
+		return next(new ErrorResponse('Unauthorized access to the resources', 401));
+	if (req.user.new_account) {
+		return res.status(200).json({
+			success: true,
+			education_credits: [],
+			experience_credit: [],
+		});
+	} else {
+		let query = `
+			SELECT 
+				school_name, 
+				degree, 
+				starting_date, ending_date 
+			FROM USER_EXPERIENCES
+			WHERE USER_ID=${req.user.id} 
+		`;
+
+		db.query(query, (err, eduResults) => {
+			if (err) return next(err);
+
+			query = `
+				SELECT 
+					company_name, 
+					job_title, 
+					starting_date, ending_date 
+				FROM USER_EXPERIENCES
+				WHERE USER_ID=${req.user.id}
+			`;
+
+			db.query(query, (err, jobResults) => {
+				if (err) return next(err);
+
+				return res.status(200).json({
+					success: true,
+					education_credits: eduResults,
+					experience_credit: jobResults,
+				});
+			});
+		});
+	}
+};
+
+/**
+ *
  * @desc User Profile edit/create/get Handler
  * @route /api/v1/user/:id/profile
  * @access private (public for GET request)

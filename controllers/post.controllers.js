@@ -269,18 +269,18 @@ exports.getPostsHandler = (req, res, next) => {
 	let requestedUserID = req.user ? req.user.id : null;
 
 	let query = `
-		select 
+		SELECT 
 			concat(substr(p.body, 1, 100), "....") as body, 
 			p.id, p.user_id, p.created_at, 
 			up.github_username, u.name,
 			r.reaction,
 			count(c.id) as comments
-			from posts p
-			inner join user_profiles up on p.user_id = up.user_id
-			inner join users u on u.id = p.user_id
-			left join post_comments c on c.post_id = p.id
-			left join post_reactions r on r.post_id = p.id && r.user_id = ${requestedUserID} 
-			group by p.id;
+			FROM POSTS p
+			INNER JOIN USER_PROFILES up ON p.user_id = up.user_id
+			INNER JOIN USERS u ON u.id = p.user_id
+			LEFT JOIN POST_COMMENTS c ON c.post_id = p.id
+			LEFT JOIN POST_REACTIONS r ON r.post_id = p.id && r.user_id = ${requestedUserID}
+			GROUP BY p.id;
 		`;
 
 	db.query(query, (err, results) => {

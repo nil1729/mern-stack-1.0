@@ -11,6 +11,16 @@ const StyledInput = styled.input`
 	box-shadow: none !important;
 	border-radius: 0;
 	font-size: 0.85rem;
+	&:focus {
+		color: #000000;
+	}
+	&.wrong_input {
+		border-color: red;
+	}
+`;
+
+const StyledInputErrorMessage = styled.small`
+	color: red;
 `;
 
 const StyledSelect = styled.select`
@@ -68,6 +78,7 @@ const StyledHelperText = styled.small`
 export {
 	PageContainer,
 	StyledInput,
+	StyledInputErrorMessage,
 	StyledSelect,
 	StyledHelperText,
 	StyledTextArea,

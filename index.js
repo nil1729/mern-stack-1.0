@@ -18,7 +18,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 // use logger for development
-if (process.env.NODE_ENV !== 'production') app.use(require('morgan')('dev'));
+if (process.env.NODE_ENV !== 'production') {
+	app.use(require('morgan')('dev'));
+	app.use(require('cors')());
+}
 
 // Database Setup (Create Connection to Database)
 const db = mysql.createConnection({

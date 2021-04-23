@@ -69,8 +69,12 @@ const signIn = (data, res, next) => {
 	// Finding user with given email address
 	let query = `
 		SELECT 
-			email_address, 
-			email_verified, 
+			email_address as email, 
+            email_verified, 
+        	name, username, id,
+			verification_email_sent,
+			new_account,
+            created_at, updated_at, 
 			password 
 		FROM USERS WHERE email_address = "${data.email}";
 	`;
@@ -82,7 +86,7 @@ const signIn = (data, res, next) => {
 			return next(new ErrorResponse('Incorrect Email address or Password! Please try again', 401));
 
 		// extract emails, password and email_verification_status
-		let { email_address: email, password, email_verified } = result[0];
+		let { email, password, email_verified } = result[0];
 
 		bcrypt.compare(data.password, password, function (err, matched) {
 			if (err) return next(err);
@@ -99,7 +103,10 @@ const signIn = (data, res, next) => {
 					email,
 				},
 				message: 'Successfully signed in',
-				email_verified: email_verified === 0 ? false : true,
+				user: {
+					...result[0],
+					password: undefined,
+				},
 			};
 
 			// create Token and send with cookies
@@ -132,7 +139,11 @@ const sendTokenResponseWithCookie = (data, statusCode, res, next) => {
 				message: data.message,
 				responses: {
 					accessToken,
-					email_verified: data.email_verified,
+					user: {
+						...data.user,
+						email_verified: data.user.email_verified === 0 ? false : true,
+						new_account: data.user.new_account === 0 ? false : true,
+					},
 				},
 			});
 	});
