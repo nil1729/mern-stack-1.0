@@ -38,4 +38,4 @@ class checker {
 	}
 }
 
-module.exports = new checker();
+export default new checker();
