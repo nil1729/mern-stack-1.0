@@ -9,7 +9,8 @@ const express = require('express'),
 	authRoutes = require('./routes/auth.routes'),
 	userProfileRoutes = require('./routes/profile.routes'),
 	postRoutes = require('./routes/post.routes'),
-	developersRoute = require('./routes/dev.routes');
+	developersRoute = require('./routes/dev.routes'),
+	path = require('path');
 
 // Middleware read JSON Request Body
 app.use(express.json());
