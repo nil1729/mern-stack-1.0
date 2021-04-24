@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import Toast from 'react-bootstrap/Toast';
 
-const Alert = ({ authAlerts }) => {
+const Alert = ({ alerts }) => {
 	const [show, setShow] = useState(false);
 
 	const toggleShow = () => setShow(!show);
@@ -10,11 +10,11 @@ const Alert = ({ authAlerts }) => {
 	const [currentAlert, setCurrentAlert] = useState(null);
 
 	useEffect(() => {
-		if (authAlerts) {
-			setCurrentAlert(authAlerts);
+		if (alerts) {
+			setCurrentAlert(alerts);
 			setShow(true);
 		}
-	}, [authAlerts]);
+	}, [alerts]);
 
 	return (
 		<>
@@ -23,7 +23,7 @@ const Alert = ({ authAlerts }) => {
                     .toast_container {
                         min-width: 300px;
                         max-width: 380px;
-                        position: absolute;
+                        position: fixed;
 					    top: 4rem;
 					    right: 1%;
                     }
@@ -76,7 +76,7 @@ const Alert = ({ authAlerts }) => {
 };
 
 const mapStateToProps = (state) => ({
-	authAlerts: state.AUTH_STATE.alerts,
+	alerts: state.ALERTS,
 });
 
 export default connect(mapStateToProps, {})(Alert);

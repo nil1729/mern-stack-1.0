@@ -11,7 +11,10 @@ if (process.env.NODE_ENV === 'production') {
 	});
 }
 
-let accessToken = localStorage.getItem('ACCESS_TOKEN');
-if (accessToken) instance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+const setAuthToken = (token) => {
+	if (token) instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+	else delete instance.defaults.headers.common['Authorization'];
+};
 
 export default instance;
+export { setAuthToken };

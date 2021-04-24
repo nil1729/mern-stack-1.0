@@ -11,12 +11,21 @@ const StyledInput = styled.input`
 	box-shadow: none !important;
 	border-radius: 0;
 	font-size: 0.85rem;
+	color: #000000;
 	&:focus {
 		color: #000000;
 	}
 	&.wrong_input {
 		border-color: red;
 	}
+`;
+
+const StyledInputGroupText = styled.span`
+	height: calc(1.5em + 0.5rem + 2px);
+	outline: none;
+	border-radius: 0;
+	font-size: 0.85rem;
+	color: #000000;
 `;
 
 const StyledInputErrorMessage = styled.small`
@@ -85,4 +94,5 @@ export {
 	StyledLabel,
 	GreyLinkButton,
 	TableItem,
+	StyledInputGroupText,
 };

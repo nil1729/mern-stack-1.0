@@ -17,21 +17,21 @@ import {
 	StyledInputErrorMessage,
 } from '../utils/styled-components/components';
 import { connect } from 'react-redux';
-import { loadUser, signInUser } from '../../store/actions/auth';
+import { signInUser } from '../../store/actions/auth';
 import checker from '../utils/checkFields';
 
-const Login = ({ authState: { isAuthenticated, user }, signInUser, loadUser }) => {
+const Login = ({ authState: { isAuthenticated }, signInUser }) => {
 	const history = useHistory();
+
+	// Set Login initials Form state
+	const [submitted, setSubmitted] = useState(false);
+	const [userInput, setUserInput] = useState({ email: '', password: '' });
+	const [wrongUserInput, setWrongUserInput] = useState({ email: false });
 
 	useEffect(() => {
 		if (isAuthenticated) history.push('/dashboard');
 		// eslint-disable-next-line
 	}, [isAuthenticated]);
-
-	// Set Login initials Form state
-	const [submitted, setSubmitted] = useState(false);
-	const [userInput, setUserInput] = useState({ email: '', password: '' });
-	const [wrongUserInput, setWrongUserInput] = useState({ email: false, password: false });
 
 	// On change handler
 	const onChange = (e) => {
@@ -51,32 +51,23 @@ const Login = ({ authState: { isAuthenticated, user }, signInUser, loadUser }) =
 		e.preventDefault();
 
 		// Validate email and password strength
-		if (!validateInput(userInput.email, userInput.password)) return;
+		if (!validateInput(userInput.email)) return;
 
 		setSubmitted(true);
 
 		// call redux action with data
-		await signInUser(userInput);
+		const isSuccess = await signInUser(userInput);
 
-		setSubmitted(false);
+		if (!isSuccess) setSubmitted(false);
 	};
 
 	// validate input
-	const validateInput = (email, password) => {
+	const validateInput = (email) => {
 		// check email
 		if (!checker.email(email)) {
 			setWrongUserInput({
 				...wrongUserInput,
 				email: true,
-			});
-			return false;
-		}
-
-		// check password strength
-		if (!checker.password(password)) {
-			setWrongUserInput({
-				...wrongUserInput,
-				password: true,
 			});
 			return false;
 		}
@@ -123,16 +114,8 @@ const Login = ({ authState: { isAuthenticated, user }, signInUser, loadUser }) =
 						type='password'
 						onChange={onChange}
 						value={userInput.password}
-						className={`form-control ${wrongUserInput.password ? 'wrong_input' : ''}`}
+						className='form-control'
 					/>
-					{wrongUserInput.password ? (
-						<StyledInputErrorMessage>
-							Please use a password with minimum 8 characters. Contains at least 1 symbol, 1
-							uppercase, 1 number, 1 lowercase{' '}
-						</StyledInputErrorMessage>
-					) : (
-						<></>
-					)}
 				</div>
 				<button type='submit' className='btn btn-info btn-sm' disabled={submitted}>
 					{submitted ? (
@@ -156,4 +139,4 @@ const mapStateToProps = (state) => ({
 	authState: state.AUTH_STATE,
 });
 
-export default connect(mapStateToProps, { signInUser, loadUser })(Login);
+export default connect(mapStateToProps, { signInUser })(Login);

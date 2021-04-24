@@ -1,25 +1,28 @@
-import {
-	SIGN_UP,
-	SIGN_IN,
-	LOAD_USER,
-	LOG_OUT,
-	CLEAR_ALERTS,
-	AUTH_ALERTS,
-	AUTH_ERROR,
-	STOP_INITIAL_LOADER,
-} from '../types';
-import sendRequest from '../utils/axios-setup';
+import { SIGN_UP, SIGN_IN, LOAD_USER, LOG_OUT, STOP_INITIAL_LOADER, ADD_ALERTS } from '../types';
+import sendRequest, { setAuthToken } from '../utils/axios-setup';
 
 // Load user on Start
 const loadUser = () => async (dispatch) => {
 	try {
+		let accessToken = localStorage.getItem('ACCESS_TOKEN');
+		if (accessToken) setAuthToken(accessToken);
+		else return dispatch({ type: STOP_INITIAL_LOADER });
+
 		const res = await sendRequest.get('/auth/user');
 		dispatch({ type: LOAD_USER, payload: res.data });
+		dispatch({
+			type: ADD_ALERTS,
+			payload: res.data.user.new_account
+				? {
+						success: true,
+						message: 'Kindly create your developer profile',
+				  }
+				: null,
+		});
 	} catch (e) {
-		dispatch({ type: STOP_INITIAL_LOADER });
 		if (e.response && e.response.status === 403) {
 			dispatch({
-				type: AUTH_ERROR,
+				type: ADD_ALERTS,
 				payload: e.response && e.response.data,
 			});
 		}
@@ -33,10 +36,66 @@ const signInUser = ({ email, password }) => async (dispatch) => {
 			email,
 			password,
 		});
+		setAuthToken(res.data.responses.accessToken);
 		dispatch({ type: SIGN_IN, payload: res.data });
+		dispatch({
+			type: ADD_ALERTS,
+			payload: res.data.responses.user.new_account
+				? [
+						{
+							success: true,
+							message: res.data.message,
+						},
+						{
+							success: true,
+							message: 'Kindly create your developer profile',
+						},
+				  ]
+				: {
+						success: true,
+						message: res.data.message,
+				  },
+		});
+		return true;
 	} catch (e) {
 		dispatch({
-			type: AUTH_ERROR,
+			type: ADD_ALERTS,
+			payload: e.response && e.response.data,
+		});
+	}
+};
+
+// Register a user (Email and Password)
+const signUpUser = ({ name, email, password }) => async (dispatch) => {
+	try {
+		const res = await sendRequest.post('/auth/register', {
+			name,
+			email,
+			password,
+		});
+		setAuthToken(res.data.responses.accessToken);
+		dispatch({ type: SIGN_UP, payload: res.data });
+		dispatch({
+			type: ADD_ALERTS,
+			payload: res.data.responses.user.new_account
+				? [
+						{
+							success: true,
+							message: res.data.message,
+						},
+						{
+							success: true,
+							message: 'Kindly create your developer profile',
+						},
+				  ]
+				: {
+						success: true,
+						message: res.data.message,
+				  },
+		});
+	} catch (e) {
+		dispatch({
+			type: ADD_ALERTS,
 			payload: e.response && e.response.data,
 		});
 	}
@@ -45,4 +104,4 @@ const signInUser = ({ email, password }) => async (dispatch) => {
 // logout user
 const logOut = () => async (dispatch) => dispatch({ type: LOG_OUT });
 
-export { signInUser, loadUser, logOut };
+export { signInUser, loadUser, logOut, signUpUser };

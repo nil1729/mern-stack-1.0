@@ -4,16 +4,13 @@ import {
 	SIGN_IN,
 	LOAD_USER,
 	LOG_OUT,
-	CLEAR_ALERTS,
-	AUTH_ALERTS,
-	AUTH_ERROR,
 	STOP_INITIAL_LOADER,
+	USER_DEV_PROFILE_CREATE,
 } from '../types';
 
 // Initial Auth State
 const initialState = {
 	isAuthenticated: false,
-	alerts: null,
 	loading: true,
 	user: null,
 };
@@ -21,32 +18,13 @@ const initialState = {
 // Reducer
 const authReducers = (state = initialState, action) => {
 	switch (action.type) {
-		case AUTH_ERROR:
-			return {
-				...state,
-				alerts: action.payload,
-			};
+		case SIGN_UP:
 		case SIGN_IN:
 			localStorage.setItem('ACCESS_TOKEN', action.payload.responses.accessToken);
 			return {
 				...state,
 				isAuthenticated: true,
 				user: action.payload.responses.user,
-				alerts: action.payload.responses.user.new_account
-					? [
-							{
-								success: true,
-								message: action.payload.message,
-							},
-							{
-								success: true,
-								message: 'Kindly create your developer profile',
-							},
-					  ]
-					: {
-							success: true,
-							message: action.payload.message,
-					  },
 			};
 		case LOAD_USER: {
 			return {
@@ -54,12 +32,6 @@ const authReducers = (state = initialState, action) => {
 				isAuthenticated: true,
 				loading: false,
 				user: action.payload.user,
-				alerts: action.payload.user.new_account
-					? {
-							success: true,
-							message: 'Kindly create your developer profile',
-					  }
-					: null,
 			};
 		}
 		case STOP_INITIAL_LOADER:
@@ -72,9 +44,16 @@ const authReducers = (state = initialState, action) => {
 			return {
 				...state,
 				isAuthenticated: false,
-				alerts: null,
 				loading: false,
 				user: null,
+			};
+		case USER_DEV_PROFILE_CREATE:
+			return {
+				...state,
+				user: {
+					...state.user,
+					new_account: false,
+				},
 			};
 		default: {
 			return state;

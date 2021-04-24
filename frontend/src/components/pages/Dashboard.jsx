@@ -6,45 +6,72 @@
  *
  */
 
-import React from 'react';
-import {
-	PageContainer,
-	GreyLinkButton,
-	TableItem,
-} from '../utils/styled-components/components';
+import React, { useState, useEffect } from 'react';
+import { PageContainer, GreyLinkButton, TableItem } from '../utils/styled-components/components';
+import Spinner from 'react-bootstrap/Spinner';
+import { connect } from 'react-redux';
+import { fetchDashboard } from '../../store/actions/user_profile';
+import moment from 'moment';
 
-// const styles = {};
+const DurationComponent = ({ startingDate, endingDate }) => {
+	const sDate = new Date(startingDate).getDate();
+	const sDateOrder = moment(startingDate).format('Do').slice(-2);
+	const sMonth = moment(startingDate).format('MMMM');
+	const sYear = new Date(startingDate).getFullYear();
 
-const Developers = () => {
+	let eDate, eDateOrder, eMonth, eYear;
+	if (endingDate) {
+		eDate = new Date(endingDate).getDate();
+		eDateOrder = moment(endingDate).format('Do').slice(-2);
+		eMonth = moment(endingDate).format('MMMM');
+		eYear = new Date(endingDate).getFullYear();
+	}
+
+	return (
+		<TableItem>
+			{sDate}
+			<sup>{sDateOrder}</sup> {sMonth} {sYear} -{' '}
+			{!endingDate ? (
+				'Now'
+			) : (
+				<>
+					{eDate}
+					<sup>{eDateOrder}</sup> {eMonth} {eYear}
+				</>
+			)}
+		</TableItem>
+	);
+};
+
+const Developers = ({ authState: { isAuthenticated, user }, fetchDashboard, userProfileState }) => {
+	useEffect(() => {
+		if (user && userProfileState.dashboard === null) fetchDashboard(user.id);
+		// eslint-disable-next-line
+	}, [isAuthenticated]);
+
 	return (
 		<PageContainer className='container py-3 mb-5 auth__container'>
 			<h2 className='text-info mb-1'>Dashboard</h2>
-			<p
-				className='lead mb-4 text-capitalize'
-				style={{ fontSize: '15.5px', fontWeight: 500 }}
-			>
+			<p className='lead mb-4 text-capitalize' style={{ fontSize: '15.5px', fontWeight: 500 }}>
 				<i className='fal fa-user mr-2'></i>
-				welcome nilanjan deb
+				welcome {user ? user.name : 'DevConnector User'}
 			</p>
 			<div>
-				<GreyLinkButton
-					smallfont='true'
-					to='/dashboard/profile'
-					className='btn btn-light btn-sm'
-				>
-					<i className='text-info fas fa-user-edit mr-1'></i>Edit Profile
+				<GreyLinkButton smallfont='true' to='/dashboard/profile' className='btn btn-light btn-sm'>
+					<i className='text-info fas fa-user-edit mr-1'></i>
+					{user && !user.new_account ? 'Edit' : 'Create'} Profile
 				</GreyLinkButton>
 				<GreyLinkButton
 					smallfont='true'
 					to='/dashboard/experience'
-					className='btn btn-light btn-sm mx-3'
+					className={`btn btn-light btn-sm mx-3 ${user && user.new_account ? 'disabled' : ''}`}
 				>
 					<i className='text-info mr-1 fab fa-black-tie'></i>Add Experience
 				</GreyLinkButton>
 				<GreyLinkButton
 					smallfont='true'
 					to='/dashboard/education'
-					className='btn btn-light btn-sm'
+					className={`btn btn-light btn-sm ${user && user.new_account ? 'disabled' : ''}`}
 				>
 					<i className='text-info mr-1 fas fa-graduation-cap'></i>Add Education
 				</GreyLinkButton>
@@ -67,23 +94,39 @@ const Developers = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{[1, 2].map((id, index) => (
-							<tr key={id}>
-								<TableItem>Student Union Tech Team</TableItem>
-								<TableItem>Web Developer</TableItem>
-								<TableItem>
-									26<sup>th</sup> September 2019 - Now
-								</TableItem>
-								<TableItem>
-									<button
-										style={{ fontSize: '13px' }}
-										className='btn btn-danger btn-sm'
-									>
-										Delete<i className='fas fa-trash ml-1'></i>
-									</button>
+						{userProfileState.loading || userProfileState.dashboard === null ? (
+							<tr>
+								<TableItem colSpan='4'>
+									<div className='text-center'>
+										<Spinner animation='border' />
+									</div>
 								</TableItem>
 							</tr>
-						))}
+						) : userProfileState.dashboard.experiences.length === 0 ? (
+							<tr>
+								<TableItem colSpan='4'>
+									<p className='text-center lead'>You didn't add any job experience yet</p>
+								</TableItem>
+							</tr>
+						) : (
+							<>
+								{userProfileState.dashboard.experiences.map((exp, index) => (
+									<tr key={exp.id}>
+										<TableItem>{exp.company_name}</TableItem>
+										<TableItem>{exp.job_title}</TableItem>
+										<DurationComponent
+											startingDate={exp.starting_date}
+											endingDate={exp.ending_date}
+										/>
+										<TableItem>
+											<button style={{ fontSize: '13px' }} className='btn btn-danger btn-sm'>
+												Delete<i className='fas fa-trash ml-1'></i>
+											</button>
+										</TableItem>
+									</tr>
+								))}
+							</>
+						)}
 					</tbody>
 				</table>
 			</div>
@@ -105,23 +148,39 @@ const Developers = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{[1].map((id, index) => (
-							<tr key={id}>
-								<TableItem>BITS Pilani, Pilani Campus</TableItem>
-								<TableItem>Bachelor of Engineering</TableItem>
-								<TableItem>
-									26<sup>th</sup> September 2019 - Now
-								</TableItem>
-								<TableItem>
-									<button
-										style={{ fontSize: '13px' }}
-										className='btn btn-danger btn-sm'
-									>
-										Delete<i className='fas fa-trash ml-1'></i>
-									</button>
+						{userProfileState.loading || userProfileState.dashboard === null ? (
+							<tr>
+								<TableItem colSpan='4'>
+									<div className='text-center'>
+										<Spinner animation='border' />
+									</div>
 								</TableItem>
 							</tr>
-						))}
+						) : userProfileState.dashboard.educations.length === 0 ? (
+							<tr>
+								<TableItem colSpan='4'>
+									<p className='text-center lead'>You didn't add any education status yet</p>
+								</TableItem>
+							</tr>
+						) : (
+							<>
+								{userProfileState.dashboard.educations.map((edu, index) => (
+									<tr key={edu.id}>
+										<TableItem>{edu.school_name}</TableItem>
+										<TableItem>{edu.degree}</TableItem>
+										<DurationComponent
+											startingDate={edu.starting_date}
+											endingDate={edu.ending_date}
+										/>
+										<TableItem>
+											<button style={{ fontSize: '13px' }} className='btn btn-danger btn-sm'>
+												Delete<i className='fas fa-trash ml-1'></i>
+											</button>
+										</TableItem>
+									</tr>
+								))}
+							</>
+						)}
 					</tbody>
 				</table>
 			</div>
@@ -132,4 +191,9 @@ const Developers = () => {
 	);
 };
 
-export default Developers;
+const mapStateToProps = (state) => ({
+	authState: state.AUTH_STATE,
+	userProfileState: state.USER_PROFILE,
+});
+
+export default connect(mapStateToProps, { fetchDashboard })(Developers);
