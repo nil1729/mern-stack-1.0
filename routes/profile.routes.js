@@ -1,6 +1,7 @@
 const express = require('express'),
 	router = express.Router({ mergeParams: true }),
 	{
+		getDevProfileHandler,
 		getDashboardHandler,
 		profileHandler,
 		addExperience,
@@ -15,6 +16,7 @@ const express = require('express'),
 	} = require('../middleware/auth.middleware');
 
 router.route('/dashboard').get(checkAuthentication, getDashboardHandler);
+router.route('/dashboard/dev-profile').get(checkAuthentication, getDevProfileHandler);
 
 router
 	.route('/')

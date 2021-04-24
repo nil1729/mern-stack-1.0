@@ -80,7 +80,7 @@ const DevProfileForm = ({
 					let inputKey = key.split('_url')[0].concat('_id');
 					populatedFields[inputKey] =
 						(userProfileState.profile[key] || '').split(socialURLs[key])[1] || '';
-					setSocialLinkOpen(true);
+					if (populatedFields[inputKey].trim().length > 0) setSocialLinkOpen(true);
 				} else populatedFields[key] = userProfileState.profile[key] || '';
 			});
 			setUserInput(populatedFields);

@@ -1,6 +1,5 @@
 const validator = require('validator');
 class checker {
-	constructor() {}
 	alphabetic(word) {
 		if (word && validator.matches(word, /^[A-Za-z\s]+$/)) return true;
 		return false;

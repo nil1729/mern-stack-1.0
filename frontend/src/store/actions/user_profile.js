@@ -5,6 +5,7 @@ import {
 	GET_DEV_PROFILE,
 	ADD_ALERTS,
 	USER_DEV_PROFILE_CREATE,
+	DEV_PROFILE_CHANGE,
 } from '../types';
 
 import sendRequest from '../utils/axios-setup';
@@ -42,6 +43,10 @@ const createDevProfile = (userID, data) => async (dispatch) => {
 		const res = await sendRequest.post(`/user/${userID}/profile`, data);
 
 		dispatch({
+			type: DEV_PROFILE_CHANGE,
+			payload: data,
+		});
+		dispatch({
 			type: ADD_ALERTS,
 			payload: res.data,
 		});
@@ -57,6 +62,10 @@ const updateDevProfile = (userID, data) => async (dispatch) => {
 	try {
 		const res = await sendRequest.put(`/user/${userID}/profile`, data);
 
+		dispatch({
+			type: DEV_PROFILE_CHANGE,
+			payload: data,
+		});
 		dispatch({
 			type: ADD_ALERTS,
 			payload: res.data,

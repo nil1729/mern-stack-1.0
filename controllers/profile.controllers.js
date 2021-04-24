@@ -21,7 +21,7 @@ const ErrorResponse = require('../utils/errorResponse'),
  *
  */
 exports.getDashboardHandler = (req, res, next) => {
-	if (req.user.id !== req.params.user_id)
+	if (Number(req.user.id) !== Number(req.params.user_id))
 		return next(new ErrorResponse('Unauthorized access to the resources', 401));
 	if (req.user.new_account) {
 		return res.status(200).json({
@@ -32,10 +32,11 @@ exports.getDashboardHandler = (req, res, next) => {
 	} else {
 		let query = `
 			SELECT 
+				id,
 				school_name, 
 				degree, 
 				starting_date, ending_date 
-			FROM USER_EXPERIENCES
+			FROM USER_EDUCATIONS
 			WHERE USER_ID=${req.user.id} 
 		`;
 
@@ -44,6 +45,7 @@ exports.getDashboardHandler = (req, res, next) => {
 
 			query = `
 				SELECT 
+					id,
 					company_name, 
 					job_title, 
 					starting_date, ending_date 
@@ -59,6 +61,51 @@ exports.getDashboardHandler = (req, res, next) => {
 					education_credits: eduResults,
 					experience_credit: jobResults,
 				});
+			});
+		});
+	}
+};
+
+/**
+ *
+ * @desc Create/Edit Profile Page GET handler
+ * @route GET /api/v1/user/:id/profile/dashboard/dev-profile
+ * @access private
+ *
+ */
+exports.getDevProfileHandler = (req, res, next) => {
+	if (Number(req.user.id) !== Number(req.params.user_id))
+		return next(new ErrorResponse('Unauthorized access to the resources', 401));
+	if (req.user.new_account) {
+		return res.status(200).json({
+			success: true,
+			profile: null,
+		});
+	} else {
+		let query = `
+			SELECT
+				current_position,
+				current_working_place_name,
+				skills,
+				github_username,
+				bio,
+				website_url,
+				twitter_url,
+				youtube_channel_url,
+				linkedin_url,
+				instagram_url,
+				facebook_url,
+				location
+			FROM USER_PROFILES
+			WHERE USER_ID=${req.user.id} 
+		`;
+
+		db.query(query, (err, result) => {
+			if (err) return next(err);
+
+			return res.status(200).json({
+				success: true,
+				profile: result[0],
 			});
 		});
 	}
@@ -90,7 +137,8 @@ exports.profileHandler = (req, res, next) => {
 				errors.push(`${incomingFields[i]} is not a valid URL`);
 			}
 		}
-		if (errors.length > 0) next(new ErrorResponse('Please provide valid URL(s)', 400, errors));
+		if (errors.length > 0)
+			return next(new ErrorResponse('Please provide valid URL(s)', 400, errors));
 
 		if (req.body.bio) req.body.bio = xss(req.body.bio);
 

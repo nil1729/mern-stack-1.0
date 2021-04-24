@@ -93,6 +93,7 @@ const signUpUser = ({ name, email, password }) => async (dispatch) => {
 						message: res.data.message,
 				  },
 		});
+		return true;
 	} catch (e) {
 		dispatch({
 			type: ADD_ALERTS,

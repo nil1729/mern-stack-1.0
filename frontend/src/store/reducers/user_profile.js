@@ -4,6 +4,7 @@ import {
 	USER_PROFILE_LOADING_START,
 	CLEAR_USER_PROFILE,
 	GET_DEV_PROFILE,
+	DEV_PROFILE_CHANGE,
 } from '../types';
 
 // Initial Auth State
@@ -35,6 +36,14 @@ const userProfileReducers = (state = initialState, action) => {
 			return {
 				...state,
 				loading: true,
+			};
+		case DEV_PROFILE_CHANGE:
+			return {
+				...state,
+				profile: {
+					...state.profile,
+					...action.payload,
+				},
 			};
 		case CLEAR_USER_PROFILE:
 			return initialState;

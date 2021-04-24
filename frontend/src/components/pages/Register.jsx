@@ -60,9 +60,9 @@ const Register = ({ signUpUser, authState: { isAuthenticated } }) => {
 		setSubmitted(true);
 
 		// call redux action with data
-		await signUpUser(userInput);
+		const isSuccess = await signUpUser(userInput);
 
-		setSubmitted(false);
+		if (!isSuccess) setSubmitted(false);
 	};
 
 	// validate input

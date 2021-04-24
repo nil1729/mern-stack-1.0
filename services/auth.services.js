@@ -47,17 +47,36 @@ const signUp = (data, res, next) => {
 				db.query(query, (err) => {
 					if (err) return next(err);
 
-					// Successful Response
-					let data = {
-						payload: {
-							email,
-						},
-						message: 'User registration successful. Kindly verify your email address',
-						email_verified: false,
-					};
+					query = `
+						SELECT 
+							email_address as email, 
+							email_verified, 
+							name, username, id,
+							verification_email_sent,
+							new_account,
+							created_at, updated_at, 
+							password 
+						FROM USERS WHERE email_address = "${email}";
+					`;
 
-					// create Token and send with cookies
-					sendTokenResponseWithCookie(data, 201, res, next);
+					db.query(query, (err, result) => {
+						if (err) return next(err);
+
+						// Successful Response
+						let data = {
+							payload: {
+								email,
+							},
+							message: 'User registration successful. Kindly verify your email address',
+							user: {
+								...result[0],
+								password: undefined,
+							},
+						};
+
+						// create Token and send with cookies
+						sendTokenResponseWithCookie(data, 201, res, next);
+					});
 				});
 			});
 		});
