@@ -154,8 +154,9 @@ const DevProfileForm = ({
 		setSubmitted(true);
 
 		// call redux action with data
-		if (user.new_account) await createDevProfile(user.id, devProfileInputs);
-		else await updateDevProfile(user.id, devProfileInputs);
+		if (user.new_account)
+			await createDevProfile(user.id, devProfileInputs, { ...devProfileInputs, ...userInput });
+		else await updateDevProfile(user.id, devProfileInputs, { ...devProfileInputs, ...userInput });
 
 		setSubmitted(false);
 	};

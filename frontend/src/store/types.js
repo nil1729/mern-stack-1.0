@@ -5,6 +5,7 @@ export const LOAD_USER = 'LOAD_USER';
 export const LOG_OUT = 'LOG_OUT';
 export const STOP_INITIAL_LOADER = 'STOP_INITIAL_LOADER';
 export const USER_DEV_PROFILE_CREATE = 'USER_DEV_PROFILE_CREATE';
+export const AUTH_ERROR = 'AUTH_ERROR';
 
 // USER PROFILE Handle Reducers
 export const FETCH_DASHBOARD = 'FETCH_DASHBOARD';

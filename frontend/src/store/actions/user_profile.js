@@ -38,13 +38,13 @@ const fetchDevProfile = (userID) => async (dispatch) => {
 	}
 };
 
-const createDevProfile = (userID, data) => async (dispatch) => {
+const createDevProfile = (userID, data, currentProfile) => async (dispatch) => {
 	try {
 		const res = await sendRequest.post(`/user/${userID}/profile`, data);
 
 		dispatch({
 			type: DEV_PROFILE_CHANGE,
-			payload: data,
+			payload: currentProfile,
 		});
 		dispatch({
 			type: ADD_ALERTS,
@@ -58,13 +58,13 @@ const createDevProfile = (userID, data) => async (dispatch) => {
 	}
 };
 
-const updateDevProfile = (userID, data) => async (dispatch) => {
+const updateDevProfile = (userID, data, currentProfile) => async (dispatch) => {
 	try {
 		const res = await sendRequest.put(`/user/${userID}/profile`, data);
 
 		dispatch({
 			type: DEV_PROFILE_CHANGE,
-			payload: data,
+			payload: currentProfile,
 		});
 		dispatch({
 			type: ADD_ALERTS,

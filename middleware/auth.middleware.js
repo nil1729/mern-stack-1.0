@@ -67,7 +67,7 @@ exports.checkAuthentication = asyncHandler((req, res, next) => {
 				return next(
 					new ErrorResponse(
 						'Oops! No user found. Maybe your account disabled or permanently deleted.',
-						401
+						403
 					)
 				);
 

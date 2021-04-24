@@ -6,6 +6,7 @@ import {
 	LOG_OUT,
 	STOP_INITIAL_LOADER,
 	USER_DEV_PROFILE_CREATE,
+	AUTH_ERROR,
 } from '../types';
 
 // Initial Auth State
@@ -39,6 +40,7 @@ const authReducers = (state = initialState, action) => {
 				...state,
 				loading: false,
 			};
+		case AUTH_ERROR:
 		case LOG_OUT:
 			localStorage.clear();
 			return {

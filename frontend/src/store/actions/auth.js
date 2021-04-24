@@ -1,4 +1,12 @@
-import { SIGN_UP, SIGN_IN, LOAD_USER, LOG_OUT, STOP_INITIAL_LOADER, ADD_ALERTS } from '../types';
+import {
+	SIGN_UP,
+	SIGN_IN,
+	LOAD_USER,
+	LOG_OUT,
+	STOP_INITIAL_LOADER,
+	ADD_ALERTS,
+	AUTH_ERROR,
+} from '../types';
 import sendRequest, { setAuthToken } from '../utils/axios-setup';
 
 // Load user on Start
@@ -20,6 +28,8 @@ const loadUser = () => async (dispatch) => {
 				: null,
 		});
 	} catch (e) {
+		dispatch({ type: AUTH_ERROR });
+		dispatch({ type: STOP_INITIAL_LOADER });
 		if (e.response && e.response.status === 403) {
 			dispatch({
 				type: ADD_ALERTS,
