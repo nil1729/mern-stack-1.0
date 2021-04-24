@@ -144,19 +144,19 @@ const DevProfileForm = ({
 
 		// Take only necessary and non empty fields
 		for (let key in userInput) {
-			if (userInput[key].trim().length > 0)
-				if (key.endsWith('_id')) {
-					let inputKey = key.split('_id')[0].concat('_url');
-					devProfileInputs[inputKey] = socialURLs[inputKey].concat(userInput[key]);
-				} else devProfileInputs[key] = userInput[key];
+			if (key.endsWith('_id')) {
+				let inputKey = key.split('_id')[0].concat('_url');
+				if (userInput[key].trim().length > 0)
+					devProfileInputs[inputKey] = socialURLs[inputKey].concat(userInput[key].trim());
+				else devProfileInputs[inputKey] = '';
+			} else devProfileInputs[key] = userInput[key].trim();
 		}
 
 		setSubmitted(true);
 
 		// call redux action with data
-		if (user.new_account)
-			await createDevProfile(user.id, devProfileInputs, { ...devProfileInputs, ...userInput });
-		else await updateDevProfile(user.id, devProfileInputs, { ...devProfileInputs, ...userInput });
+		if (user.new_account) await createDevProfile(user.id, devProfileInputs);
+		else await updateDevProfile(user.id, devProfileInputs);
 
 		setSubmitted(false);
 	};

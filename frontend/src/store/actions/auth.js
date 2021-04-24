@@ -6,6 +6,7 @@ import {
 	STOP_INITIAL_LOADER,
 	ADD_ALERTS,
 	AUTH_ERROR,
+	CLEAR_ALERTS,
 } from '../types';
 import sendRequest, { setAuthToken } from '../utils/axios-setup';
 
@@ -113,6 +114,9 @@ const signUpUser = ({ name, email, password }) => async (dispatch) => {
 };
 
 // logout user
-const logOut = () => async (dispatch) => dispatch({ type: LOG_OUT });
+const logOut = () => async (dispatch) => {
+	dispatch({ type: CLEAR_ALERTS });
+	dispatch({ type: LOG_OUT });
+};
 
 export { signInUser, loadUser, logOut, signUpUser };

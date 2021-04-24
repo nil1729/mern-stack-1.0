@@ -13,7 +13,7 @@ const Alert = ({ alerts }) => {
 		if (alerts) {
 			setCurrentAlert(alerts);
 			setShow(true);
-		}
+		} else setShow(false);
 	}, [alerts]);
 
 	return (

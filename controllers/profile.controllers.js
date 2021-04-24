@@ -133,7 +133,11 @@ exports.profileHandler = (req, res, next) => {
 				return next(new ErrorResponse('Please add all required fields', 400));
 		}
 		for (let i = 0; i < incomingFields.length; i++) {
-			if (incomingFields[i].endsWith('_url') && !checker.siteURL(req.body[incomingFields[i]])) {
+			if (
+				req.body[incomingFields[i]] !== '' &&
+				incomingFields[i].endsWith('_url') &&
+				!checker.siteURL(req.body[incomingFields[i]])
+			) {
 				errors.push(`${incomingFields[i]} is not a valid URL`);
 			}
 		}
@@ -217,7 +221,11 @@ exports.profileHandler = (req, res, next) => {
 				return next(new ErrorResponse('Please add all required fields', 400));
 
 			// Checking for URL updates
-			if (incomingFields[i].endsWith('_url') && !checker.siteURL(req.body[incomingFields[i]])) {
+			if (
+				req.body[incomingFields[i]] !== '' &&
+				incomingFields[i].endsWith('_url') &&
+				!checker.siteURL(req.body[incomingFields[i]])
+			) {
 				errors.push(`${incomingFields[i]} is not a valid URL`);
 			}
 		}

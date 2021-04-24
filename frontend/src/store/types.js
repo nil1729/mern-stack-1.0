@@ -17,3 +17,4 @@ export const DEV_PROFILE_CHANGE = 'DEV_PROFILE_CHANGE';
 // ALerts
 export const ADD_ALERTS = 'ADD_ALERTS';
 export const CLOSE_ALERT = 'CLOSE_ALERT';
+export const CLEAR_ALERTS = 'CLEAR_ALERTS';

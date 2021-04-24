@@ -1,5 +1,5 @@
 // Action Types
-import { ADD_ALERTS } from '../types';
+import { ADD_ALERTS, CLEAR_ALERTS } from '../types';
 
 // Initial Auth State
 const initialState = null;
@@ -9,6 +9,8 @@ const alertReducers = (state = initialState, action) => {
 	switch (action.type) {
 		case ADD_ALERTS:
 			return action.payload;
+		case CLEAR_ALERTS:
+			return initialState;
 		default: {
 			return state;
 		}
