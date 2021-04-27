@@ -25,7 +25,10 @@ const postReducers = (state = initialState, action) => {
 				posts: action.payload,
 			};
 		case ADD_POST:
-			return initialState;
+			return {
+				...state,
+				posts: [action.payload, ...state.posts],
+			};
 		case POST_REACTION:
 			return action.payload;
 		case ADD_COMMENT:

@@ -7,6 +7,7 @@ import {
 	ADD_COMMENT,
 	DELETE_POST,
 	DELETE_COMMENT,
+	ADD_ALERTS,
 } from '../types';
 
 import sendRequest from '../utils/axios-setup';
@@ -23,4 +24,24 @@ const fetchPosts = () => async (dispatch) => {
 	}
 };
 
-export { fetchPosts };
+const addPost = (data) => async (dispatch) => {
+	try {
+		const res = await sendRequest.post(`/posts`, data);
+		dispatch({
+			type: ADD_POST,
+			payload: res.data.newPost,
+		});
+		dispatch({
+			type: ADD_ALERTS,
+			payload: { ...res.data, newPost: undefined },
+		});
+		return true;
+	} catch (e) {
+		dispatch({
+			type: ADD_ALERTS,
+			payload: e.response && e.response.data,
+		});
+	}
+};
+
+export { fetchPosts, addPost };

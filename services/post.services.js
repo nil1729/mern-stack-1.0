@@ -8,9 +8,29 @@ exports.addPost = (data, res, next) => {
 	db.query(query, (err, result) => {
 		if (err) return next(err);
 
-		res.status(201).json({
-			success: true,
-			message: 'Your new post added to your account',
+		query = `
+			SELECT 
+				concat(substr(p.body, 1, 300), "....") as body, 
+				p.id, p.user_id as author_id, p.created_at, 
+				up.github_username, u.name as author_name,
+				r.reaction,
+				count(c.id) as comments
+			FROM POSTS p
+				INNER JOIN USER_PROFILES up ON p.user_id = up.user_id
+				INNER JOIN USERS u ON u.id = p.user_id
+				LEFT JOIN POST_COMMENTS c ON c.post_id = p.id
+				LEFT JOIN POST_REACTIONS r ON r.post_id = p.id && r.user_id = ${data.user.id}
+			WHERE p.id=${result.insertId};
+		`;
+
+		db.query(query, (err, result) => {
+			if (err) return next(err);
+
+			res.status(201).json({
+				success: true,
+				message: 'Your new post added to your account',
+				newPost: result[0],
+			});
 		});
 	});
 };

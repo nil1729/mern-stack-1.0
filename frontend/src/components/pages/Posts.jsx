@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import { PageContainer, StyledTextArea } from '../utils/styled-components/components';
 import Spinner from 'react-bootstrap/Spinner';
 import { connect } from 'react-redux';
-import { fetchPosts } from '../../store/actions/posts';
+import { fetchPosts, addPost } from '../../store/actions/posts';
 import moment from 'moment';
 
 const styles = {
@@ -41,7 +41,7 @@ const TimestampComponent = ({ timestamp }) => {
 		<>
 			{' '}
 			{tDate}
-			<sup>{tDateOrder}</sup> {tMonth} {tYear}
+			<sup>{tDateOrder}</sup> {tMonth} {tYear}, {moment(currDate).format('hh:mm a')}
 		</>
 	);
 };
@@ -50,14 +50,25 @@ function createMarkup(body) {
 	return { __html: body };
 }
 
-const Posts = ({ fetchPosts, postState, authState: { isAuthenticated, user } }) => {
+const Posts = ({ fetchPosts, addPost, postState, authState: { isAuthenticated, user } }) => {
 	const [posts, setPosts] = useState(null);
+	const [newPostBody, setNewPostBody] = useState('');
+	const [submitted, setSubmitted] = useState(false);
 
 	useEffect(() => {
 		if (user && postState.posts === null) fetchPosts();
 		if (user && postState.posts) setPosts(postState.posts);
 		// eslint-disable-next-line
 	}, [isAuthenticated, postState]);
+
+	// Submit Handling
+	const submitHandler = async (e) => {
+		e.preventDefault();
+		setSubmitted(true);
+		const isSuccess = await addPost({ body: newPostBody });
+		if (isSuccess) setNewPostBody('');
+		setSubmitted(false);
+	};
 
 	return (
 		<PageContainer className='container py-3 auth__container'>
@@ -68,16 +79,26 @@ const Posts = ({ fetchPosts, postState, authState: { isAuthenticated, user } }) 
 			</p>
 			<p className='lead bg-info px-2 py-1 text-light'>Say Something ...</p>
 
-			<form style={{ fontSize: '14px' }}>
+			<form style={{ fontSize: '14px' }} onSubmit={submitHandler}>
 				<StyledTextArea
+					disabled={submitted}
 					required
 					rows='4'
 					placeholder='Create a New Post ...'
 					className='form-control'
 					aria-label='With textarea'
+					value={newPostBody}
+					onChange={(e) => setNewPostBody(e.target.value)}
 				></StyledTextArea>
-				<button type='submit' className='btn btn-dark btn-sm mt-3'>
-					Create
+				<button disabled={submitted} type='submit' className='btn btn-dark btn-sm mt-3'>
+					{submitted ? (
+						<>
+							Posting... {'	'}
+							<Spinner as='span' animation='border' size='sm' role='status' aria-hidden='true' />
+						</>
+					) : (
+						<>Create</>
+					)}
 				</button>
 			</form>
 			<div className='mt-4'>
@@ -97,11 +118,9 @@ const Posts = ({ fetchPosts, postState, authState: { isAuthenticated, user } }) 
 						</div>
 					</>
 				) : postState.posts.length === 0 ? (
-					<>
-						<p className='text-center lead'>
-							Sorry!! Not found any posts at this moment. You can add new post here!
-						</p>
-					</>
+					<p className='text-center lead'>
+						Sorry!! Not found any posts at this moment. You can add new post here!
+					</p>
 				) : (
 					<div className='list-group'>
 						{posts &&
@@ -171,4 +190,4 @@ const mapStateToProps = (state) => ({
 	authState: state.AUTH_STATE,
 });
 
-export default connect(mapStateToProps, { fetchPosts })(Posts);
+export default connect(mapStateToProps, { fetchPosts, addPost })(Posts);

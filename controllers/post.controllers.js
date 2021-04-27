@@ -280,7 +280,8 @@ exports.getPostsHandler = (req, res, next) => {
 			INNER JOIN USERS u ON u.id = p.user_id
 			LEFT JOIN POST_COMMENTS c ON c.post_id = p.id
 			LEFT JOIN POST_REACTIONS r ON r.post_id = p.id && r.user_id = ${requestedUserID}
-			GROUP BY p.id;
+			GROUP BY p.id
+			ORDER BY p.created_at DESC;
 		`;
 
 	db.query(query, (err, results) => {

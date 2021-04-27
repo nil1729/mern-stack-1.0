@@ -26,7 +26,11 @@ const Alert = ({ alerts }) => {
                         position: fixed;
 					    top: 4rem;
 					    right: 1%;
+						z-index: 99;
                     }
+					.toast {
+						background-color: #ffffff;
+					}
                     .toast-header {
                         background-color: 
                         ${currentAlert && currentAlert.success ? '#4CAF50' : '#F44336'};
