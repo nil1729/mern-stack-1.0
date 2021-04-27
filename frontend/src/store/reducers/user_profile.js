@@ -6,6 +6,8 @@ import {
 	GET_DEV_PROFILE,
 	DEV_PROFILE_CHANGE,
 	ADD_NEW_CREDITS,
+	REMOVE_EDUCATION,
+	REMOVE_EXPERIENCE,
 } from '../types';
 
 // Initial Auth State
@@ -26,8 +28,7 @@ const userProfileReducers = (state = initialState, action) => {
 					educations: action.payload.education_credits,
 					experiences: action.payload.experience_credit,
 				},
-				new_education: null,
-				new_experience: null,
+				new_credits: null,
 			};
 		case GET_DEV_PROFILE:
 			return {
@@ -51,8 +52,23 @@ const userProfileReducers = (state = initialState, action) => {
 		case ADD_NEW_CREDITS:
 			return {
 				...state,
-				new_education: true,
-				new_experience: true,
+				new_credits: true,
+			};
+		case REMOVE_EDUCATION:
+			return {
+				...state,
+				dashboard: {
+					...state.dashboard,
+					educations: state.dashboard.educations.filter((it) => it.id !== action.payload),
+				},
+			};
+		case REMOVE_EXPERIENCE:
+			return {
+				...state,
+				dashboard: {
+					...state.dashboard,
+					experiences: state.dashboard.experiences.filter((it) => it.id !== action.payload),
+				},
 			};
 		case CLEAR_USER_PROFILE:
 			return initialState;

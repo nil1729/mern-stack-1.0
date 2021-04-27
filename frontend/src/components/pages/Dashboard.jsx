@@ -6,11 +6,11 @@
  *
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PageContainer, GreyLinkButton, TableItem } from '../utils/styled-components/components';
 import Spinner from 'react-bootstrap/Spinner';
 import { connect } from 'react-redux';
-import { fetchDashboard } from '../../store/actions/user_profile';
+import { fetchDashboard, deleteCreditFromAccount } from '../../store/actions/user_profile';
 import moment from 'moment';
 
 const DurationComponent = ({ startingDate, endingDate }) => {
@@ -43,14 +43,42 @@ const DurationComponent = ({ startingDate, endingDate }) => {
 	);
 };
 
-const Developers = ({ authState: { isAuthenticated, user }, fetchDashboard, userProfileState }) => {
+const Developers = ({
+	authState: { isAuthenticated, user },
+	userProfileState,
+	fetchDashboard,
+	deleteCreditFromAccount,
+}) => {
+	const [educations, setEducations] = useState(null);
+	const [experiences, setExperiences] = useState(null);
+
 	useEffect(() => {
 		if (user && userProfileState.dashboard === null) fetchDashboard(user.id);
-		if ((user && userProfileState.new_education) || userProfileState.new_experience)
-			fetchDashboard(user.id);
+		if (user && userProfileState.new_credits) fetchDashboard(user.id);
+		if (user && userProfileState.dashboard && !userProfileState.new_credits) {
+			setEducations(userProfileState.dashboard.educations);
+			setExperiences(userProfileState.dashboard.experiences);
+		}
 		// eslint-disable-next-line
 	}, [isAuthenticated, userProfileState]);
 
+	const deleteCredit = (id, creditType) => async () => {
+		if (creditType === 'edu')
+			setEducations(
+				educations.map((it) => {
+					if (it.id === id) return { ...it, deleting: true };
+					return it;
+				})
+			);
+		else
+			setExperiences(
+				experiences.map((it) => {
+					if (it.id === id) return { ...it, deleting: true };
+					return it;
+				})
+			);
+		await deleteCreditFromAccount(user.id, id, creditType);
+	};
 	return (
 		<PageContainer className='container py-3 mb-5 auth__container'>
 			<h2 className='text-info mb-1'>Dashboard</h2>
@@ -96,7 +124,9 @@ const Developers = ({ authState: { isAuthenticated, user }, fetchDashboard, user
 						</tr>
 					</thead>
 					<tbody>
-						{userProfileState.loading || userProfileState.dashboard === null ? (
+						{userProfileState.loading ||
+						userProfileState.dashboard === null ||
+						userProfileState.new_credits ? (
 							<tr>
 								<TableItem colSpan='4'>
 									<div className='text-center'>
@@ -112,7 +142,7 @@ const Developers = ({ authState: { isAuthenticated, user }, fetchDashboard, user
 							</tr>
 						) : (
 							<>
-								{userProfileState.dashboard.experiences.map((exp, index) => (
+								{experiences.map((exp, index) => (
 									<tr key={exp.id}>
 										<TableItem>{exp.company_name}</TableItem>
 										<TableItem>{exp.job_title}</TableItem>
@@ -121,8 +151,28 @@ const Developers = ({ authState: { isAuthenticated, user }, fetchDashboard, user
 											endingDate={exp.ending_date}
 										/>
 										<TableItem>
-											<button style={{ fontSize: '13px' }} className='btn btn-danger btn-sm'>
-												Delete<i className='fas fa-trash ml-1'></i>
+											<button
+												disabled={exp.deleting}
+												style={{ fontSize: '13px' }}
+												className='btn btn-danger btn-sm'
+												onClick={deleteCredit(exp.id, 'exp')}
+											>
+												{exp.deleting ? (
+													<>
+														Removing... {'	'}
+														<Spinner
+															as='span'
+															animation='border'
+															size='sm'
+															role='status'
+															aria-hidden='true'
+														/>
+													</>
+												) : (
+													<>
+														Delete<i className='fas fa-trash ml-1'></i>
+													</>
+												)}{' '}
 											</button>
 										</TableItem>
 									</tr>
@@ -150,7 +200,9 @@ const Developers = ({ authState: { isAuthenticated, user }, fetchDashboard, user
 						</tr>
 					</thead>
 					<tbody>
-						{userProfileState.loading || userProfileState.dashboard === null ? (
+						{userProfileState.loading ||
+						userProfileState.dashboard === null ||
+						userProfileState.new_credits ? (
 							<tr>
 								<TableItem colSpan='4'>
 									<div className='text-center'>
@@ -166,7 +218,7 @@ const Developers = ({ authState: { isAuthenticated, user }, fetchDashboard, user
 							</tr>
 						) : (
 							<>
-								{userProfileState.dashboard.educations.map((edu, index) => (
+								{educations.map((edu, index) => (
 									<tr key={edu.id}>
 										<TableItem>{edu.school_name}</TableItem>
 										<TableItem>{edu.degree}</TableItem>
@@ -175,8 +227,28 @@ const Developers = ({ authState: { isAuthenticated, user }, fetchDashboard, user
 											endingDate={edu.ending_date}
 										/>
 										<TableItem>
-											<button style={{ fontSize: '13px' }} className='btn btn-danger btn-sm'>
-												Delete<i className='fas fa-trash ml-1'></i>
+											<button
+												disabled={edu.deleting}
+												onClick={deleteCredit(edu.id, 'edu')}
+												style={{ fontSize: '13px' }}
+												className='btn btn-danger btn-sm'
+											>
+												{edu.deleting ? (
+													<>
+														Removing... {'	'}
+														<Spinner
+															as='span'
+															animation='border'
+															size='sm'
+															role='status'
+															aria-hidden='true'
+														/>
+													</>
+												) : (
+													<>
+														Delete<i className='fas fa-trash ml-1'></i>
+													</>
+												)}
 											</button>
 										</TableItem>
 									</tr>
@@ -198,4 +270,4 @@ const mapStateToProps = (state) => ({
 	userProfileState: state.USER_PROFILE,
 });
 
-export default connect(mapStateToProps, { fetchDashboard })(Developers);
+export default connect(mapStateToProps, { fetchDashboard, deleteCreditFromAccount })(Developers);

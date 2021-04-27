@@ -153,10 +153,6 @@ const AddExperience = ({ authState: { user }, addExperience }) => {
 						disabled={submitted}
 						type='date'
 						className='form-control'
-						required
-						disabled={submitted}
-						type='date'
-						className='form-control'
 						onChange={onChange}
 						value={userInput.starting_date}
 						name='starting_date'

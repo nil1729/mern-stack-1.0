@@ -7,6 +7,8 @@ import {
 	USER_DEV_PROFILE_CREATE,
 	DEV_PROFILE_CHANGE,
 	ADD_NEW_CREDITS,
+	REMOVE_EDUCATION,
+	REMOVE_EXPERIENCE,
 } from '../types';
 
 import sendRequest from '../utils/axios-setup';
@@ -112,6 +114,31 @@ const addExperience = (userID, data) => async (dispatch) => {
 	}
 };
 
+const deleteCreditFromAccount = (userID, id, creditType) => async (dispatch) => {
+	try {
+		let res;
+		if (creditType === 'edu') {
+			res = await sendRequest.delete(`/user/${userID}/profile/education/${id}`);
+			dispatch({
+				type: REMOVE_EDUCATION,
+				payload: id,
+			});
+		} else {
+			res = await sendRequest.delete(`/user/${userID}/profile/experience/${id}`);
+			dispatch({
+				type: REMOVE_EXPERIENCE,
+				payload: id,
+			});
+		}
+		dispatch({
+			type: ADD_ALERTS,
+			payload: res.data,
+		});
+	} catch (e) {
+		console.log(e);
+	}
+};
+
 const clearUserProfile = () => async (dispatch) => dispatch({ type: CLEAR_USER_PROFILE });
 
 export {
@@ -122,4 +149,5 @@ export {
 	updateDevProfile,
 	addEducation,
 	addExperience,
+	deleteCreditFromAccount,
 };
