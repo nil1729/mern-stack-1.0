@@ -87,11 +87,16 @@ exports.updatePostHandler = (req, res, next) => {
 };
 
 exports.deletePostHandler = (req, res, next) => {
-	// Checking For Duplicates
+	// Set up multi statement query
 	let query = `
+		DELETE FROM POST_COMMENTS 
+			WHERE post_id = '${req.post.id}';
+		DELETE FROM POST_REACTIONS 
+			WHERE post_id = '${req.post.id}';
         DELETE FROM POSTS 
 			WHERE id = '${req.post.id}' && 
 				user_id=${req.user.id};
+
     `;
 
 	db.query(query, (err, results) => {

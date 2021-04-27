@@ -22,7 +22,7 @@ const postReducers = (state = initialState, action) => {
 			return {
 				...state,
 				loading: false,
-				posts: action.payload,
+				posts: !state.posts ? action.payload : [...state.posts, ...action.payload],
 			};
 		case ADD_POST:
 			return {
@@ -34,7 +34,10 @@ const postReducers = (state = initialState, action) => {
 		case ADD_COMMENT:
 			return initialState;
 		case DELETE_POST:
-			return action.payload;
+			return {
+				...state,
+				posts: state.posts.filter((it) => it.id !== action.payload),
+			};
 		case DELETE_COMMENT:
 			return initialState;
 		default: {

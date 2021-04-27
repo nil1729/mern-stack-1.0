@@ -8,10 +8,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PageContainer, StyledTextArea } from '../utils/styled-components/components';
+import {
+	PageContainer,
+	StyledTextArea,
+	StyledInputErrorMessage,
+} from '../utils/styled-components/components';
 import Spinner from 'react-bootstrap/Spinner';
 import { connect } from 'react-redux';
-import { fetchPosts, addPost } from '../../store/actions/posts';
+import { fetchPosts, addPost, deletePostFromAccount } from '../../store/actions/posts';
 import moment from 'moment';
 
 const styles = {
@@ -50,9 +54,16 @@ function createMarkup(body) {
 	return { __html: body };
 }
 
-const Posts = ({ fetchPosts, addPost, postState, authState: { isAuthenticated, user } }) => {
+const Posts = ({
+	fetchPosts,
+	addPost,
+	deletePostFromAccount,
+	postState,
+	authState: { isAuthenticated, user },
+}) => {
 	const [posts, setPosts] = useState(null);
 	const [newPostBody, setNewPostBody] = useState('');
+	const [postError, setPostError] = useState(false);
 	const [submitted, setSubmitted] = useState(false);
 
 	useEffect(() => {
@@ -64,10 +75,25 @@ const Posts = ({ fetchPosts, addPost, postState, authState: { isAuthenticated, u
 	// Submit Handling
 	const submitHandler = async (e) => {
 		e.preventDefault();
+		if (newPostBody.trim().length === 0) {
+			setNewPostBody('');
+			setPostError(true);
+			return;
+		}
 		setSubmitted(true);
-		const isSuccess = await addPost({ body: newPostBody });
+		const isSuccess = await addPost({ body: newPostBody.trim() });
 		if (isSuccess) setNewPostBody('');
 		setSubmitted(false);
+	};
+
+	const deletePost = (id) => async () => {
+		setPosts(
+			posts.map((it) => {
+				if (it.id === id) return { ...it, deleting: true };
+				return it;
+			})
+		);
+		await deletePostFromAccount(id);
 	};
 
 	return (
@@ -77,30 +103,53 @@ const Posts = ({ fetchPosts, addPost, postState, authState: { isAuthenticated, u
 				<i className='fas fa-users mr-2'></i>
 				Welcome to the community
 			</p>
-			<p className='lead bg-info px-2 py-1 text-light'>Say Something ...</p>
-
-			<form style={{ fontSize: '14px' }} onSubmit={submitHandler}>
-				<StyledTextArea
-					disabled={submitted}
-					required
-					rows='4'
-					placeholder='Create a New Post ...'
-					className='form-control'
-					aria-label='With textarea'
-					value={newPostBody}
-					onChange={(e) => setNewPostBody(e.target.value)}
-				></StyledTextArea>
-				<button disabled={submitted} type='submit' className='btn btn-dark btn-sm mt-3'>
-					{submitted ? (
-						<>
-							Posting... {'	'}
-							<Spinner as='span' animation='border' size='sm' role='status' aria-hidden='true' />
-						</>
-					) : (
-						<>Create</>
-					)}
-				</button>
-			</form>
+			{user && !user.new_account ? (
+				<>
+					<p className='lead bg-info px-2 py-1 text-light'>Say Something ...</p>
+					<form style={{ fontSize: '14px' }} onSubmit={submitHandler}>
+						<StyledTextArea
+							disabled={submitted}
+							required
+							rows='4'
+							placeholder='Create a New Post ...'
+							className='form-control mb-1'
+							aria-label='With textarea'
+							value={newPostBody}
+							onChange={(e) => {
+								setNewPostBody(e.target.value);
+								setPostError(false);
+							}}
+						></StyledTextArea>
+						{postError ? (
+							<StyledInputErrorMessage className='d-block' style={{ fontSize: '0.85rem' }}>
+								Please add some text to add new post
+							</StyledInputErrorMessage>
+						) : null}
+						<button disabled={submitted} type='submit' className='btn btn-dark btn-sm mt-2'>
+							{submitted ? (
+								<>
+									Posting... {'	'}
+									<Spinner
+										as='span'
+										animation='border'
+										size='sm'
+										role='status'
+										aria-hidden='true'
+									/>
+								</>
+							) : (
+								<>Create</>
+							)}
+						</button>
+					</form>
+				</>
+			) : (
+				<>
+					<p className='bg-light px-2 py-1 text-primary text-center' style={{ fontSize: '17px' }}>
+						Kindly create your developer profile first
+					</p>
+				</>
+			)}
 			<div className='mt-4'>
 				{postState.loading || postState.posts === null ? (
 					<>
@@ -148,16 +197,26 @@ const Posts = ({ fetchPosts, addPost, postState, authState: { isAuthenticated, u
 											Posted on <TimestampComponent timestamp={post.created_at} />
 										</small>
 										<div style={{ marginTop: '12px' }}>
-											<button style={{ fontSize: '16px' }} className='btn btn-sm btn-light'>
+											<button
+												disabled={(user && user.new_account) || post.deleting}
+												style={{ fontSize: '16px' }}
+												className='btn btn-sm btn-light'
+											>
 												<i className={`${post.reaction === 1 ? 'fas' : 'far'} fa-thumbs-up`}></i>
 											</button>
-											<button style={{ fontSize: '16px' }} className='btn btn-sm btn-light mx-2'>
+											<button
+												disabled={(user && user.new_account) || post.deleting}
+												style={{ fontSize: '16px' }}
+												className='btn btn-sm btn-light mx-2'
+											>
 												<i className={`${post.reaction === 0 ? 'fas' : 'far'} fa-thumbs-down`}></i>
 											</button>
 											<Link
-												to='/posts/5fe326784snb326B'
+												to={`/posts/${post.id}`}
 												style={{ fontSize: '13.5px', position: 'relative' }}
-												className='btn btn-sm btn-info ml-2 mr-3'
+												className={`btn btn-sm btn-info ml-2 mr-3 ${
+													post.deleting ? 'disabled' : ''
+												}`}
 											>
 												Discussions
 												{post.comments > 0 ? (
@@ -170,8 +229,28 @@ const Posts = ({ fetchPosts, addPost, postState, authState: { isAuthenticated, u
 												) : null}
 											</Link>
 											{user && post.author_id === user.id ? (
-												<button style={{ fontSize: '13.5px' }} className='btn btn-sm btn-danger'>
-													<i className='far fa-trash'></i>
+												<button
+													disabled={post.deleting}
+													style={{ fontSize: '13.5px' }}
+													className='btn btn-sm btn-danger'
+													onClick={deletePost(post.id)}
+												>
+													{post.deleting ? (
+														<>
+															Deleting... {'	'}
+															<Spinner
+																as='span'
+																animation='border'
+																size='sm'
+																role='status'
+																aria-hidden='true'
+															/>
+														</>
+													) : (
+														<>
+															<i className='far fa-trash'></i>
+														</>
+													)}{' '}
 												</button>
 											) : null}
 										</div>
@@ -190,4 +269,4 @@ const mapStateToProps = (state) => ({
 	authState: state.AUTH_STATE,
 });
 
-export default connect(mapStateToProps, { fetchPosts, addPost })(Posts);
+export default connect(mapStateToProps, { fetchPosts, addPost, deletePostFromAccount })(Posts);

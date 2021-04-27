@@ -13,7 +13,7 @@ exports.addPost = (data, res, next) => {
 				concat(substr(p.body, 1, 300), "....") as body, 
 				p.id, p.user_id as author_id, p.created_at, 
 				up.github_username, u.name as author_name,
-				r.reaction,
+				max(r.reaction) as reaction,
 				count(c.id) as comments
 			FROM POSTS p
 				INNER JOIN USER_PROFILES up ON p.user_id = up.user_id

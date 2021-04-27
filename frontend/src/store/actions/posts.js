@@ -44,4 +44,23 @@ const addPost = (data) => async (dispatch) => {
 	}
 };
 
-export { fetchPosts, addPost };
+const deletePostFromAccount = (id) => async (dispatch) => {
+	try {
+		const res = await sendRequest.delete(`/posts/${id}`);
+		dispatch({
+			type: DELETE_POST,
+			payload: id,
+		});
+		dispatch({
+			type: ADD_ALERTS,
+			payload: res.data,
+		});
+	} catch (e) {
+		dispatch({
+			type: ADD_ALERTS,
+			payload: e.response && e.response.data,
+		});
+	}
+};
+
+export { fetchPosts, addPost, deletePostFromAccount };

@@ -31,6 +31,7 @@ const db = mysql.createConnection({
 	password: process.env.DB_USER_PASSWORD,
 	database: process.env.DB_DATABASE,
 	port: process.env.DB_PORT,
+	multipleStatements: true,
 });
 
 // Connect to Database
