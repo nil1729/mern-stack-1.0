@@ -32,7 +32,7 @@ exports.addPostHandler = (req, res, next) => {
 	let query = `
         SELECT COUNT(*) as duplicatePost 
 			FROM POSTS 
-			WHERE body = '${body}' && 
+			WHERE body = "${body}" && 
 				user_id=${req.user.id};
     `;
 
@@ -270,9 +270,9 @@ exports.getPostsHandler = (req, res, next) => {
 
 	let query = `
 		SELECT 
-			concat(substr(p.body, 1, 100), "....") as body, 
-			p.id, p.user_id, p.created_at, 
-			up.github_username, u.name,
+			concat(substr(p.body, 1, 300), "....") as body, 
+			p.id, p.user_id as author_id, p.created_at, 
+			up.github_username, u.name as author_name,
 			r.reaction,
 			count(c.id) as comments
 			FROM POSTS p

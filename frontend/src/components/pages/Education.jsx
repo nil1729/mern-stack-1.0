@@ -133,7 +133,9 @@ const AddEducation = ({ addEducation, authState: { user } }) => {
 					/>
 				</div>
 				<div className='mb-4'>
-					<StyledLabel className='form-label mb-1'>Field of Study</StyledLabel>
+					<StyledLabel className='form-label mb-1'>
+						Field of Study<sup>*</sup>
+					</StyledLabel>
 					<StyledInput
 						required
 						disabled={submitted}

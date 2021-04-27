@@ -6,12 +6,13 @@
  *
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import {
-	PageContainer,
-	StyledTextArea,
-} from '../utils/styled-components/components';
+import { PageContainer, StyledTextArea } from '../utils/styled-components/components';
+import Spinner from 'react-bootstrap/Spinner';
+import { connect } from 'react-redux';
+import { fetchPosts } from '../../store/actions/posts';
+import moment from 'moment';
 
 const styles = {
 	image: {
@@ -29,14 +30,39 @@ const styles = {
 	},
 };
 
-const Login = () => {
+const TimestampComponent = ({ timestamp }) => {
+	let currDate = new Date(timestamp);
+	const tDate = currDate.getDate();
+	const tDateOrder = moment(currDate).format('Do').slice(-2);
+	const tMonth = moment(currDate).format('MMMM');
+	const tYear = currDate.getFullYear();
+
+	return (
+		<>
+			{' '}
+			{tDate}
+			<sup>{tDateOrder}</sup> {tMonth} {tYear}
+		</>
+	);
+};
+
+function createMarkup(body) {
+	return { __html: body };
+}
+
+const Posts = ({ fetchPosts, postState, authState: { isAuthenticated, user } }) => {
+	const [posts, setPosts] = useState(null);
+
+	useEffect(() => {
+		if (user && postState.posts === null) fetchPosts();
+		if (user && postState.posts) setPosts(postState.posts);
+		// eslint-disable-next-line
+	}, [isAuthenticated, postState]);
+
 	return (
 		<PageContainer className='container py-3 auth__container'>
 			<h2 className='text-info mb-1'>Posts</h2>
-			<p
-				className='lead mb-3 text-capitalize'
-				style={{ fontSize: '15.5px', fontWeight: 500 }}
-			>
+			<p className='lead mb-3 text-capitalize' style={{ fontSize: '15.5px', fontWeight: 500 }}>
 				<i className='fas fa-users mr-2'></i>
 				Welcome to the community
 			</p>
@@ -44,6 +70,7 @@ const Login = () => {
 
 			<form style={{ fontSize: '14px' }}>
 				<StyledTextArea
+					required
 					rows='4'
 					placeholder='Create a New Post ...'
 					className='form-control'
@@ -54,67 +81,94 @@ const Login = () => {
 				</button>
 			</form>
 			<div className='mt-4'>
-				<div className='list-group'>
-					<div className='py-3 list-group-item d-flex align-items-center justify-content-evenly'>
+				{postState.loading || postState.posts === null ? (
+					<>
+						<style type='text/css'>
+							{`
+								.spinner-border {
+									height: 4rem;
+									width: 4rem;
+									color: rgb(20, 20, 20, 0.9);
+								}
+							`}
+						</style>
 						<div className='text-center'>
-							<img
-								src='https://avatars3.githubusercontent.com/u/54589036?v=4'
-								alt=''
-								className='img-fluid'
-								style={styles.image}
-							/>
-							<h6 className='mt-1 text-primary'>Nilanjan Deb</h6>
+							<Spinner animation='border' />
 						</div>
-						<div style={{ flex: 1.5 }} className='ml-5'>
-							<p style={{ fontSize: '13px' }} className='mb-2 text-dark'>
-								Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-								Dignissimos quibusdam, voluptas nisi eius velit ab! Rerum in
-								molestias nisi voluptatum eveniet similique! Reprehenderit
-								architecto blanditiis quidem dolore rem incidunt, unde tempore
-								inventore modi, accusantium veritatis quibusdam, ad suscipit
-								vitae mollitia!
-							</p>
-							<small className='text-muted'>
-								Posted on 26<sup>th</sup> September 2019
-							</small>
-							<div style={{ marginTop: '12px' }}>
-								<button
-									style={{ fontSize: '16px' }}
-									className='btn btn-sm btn-light'
+					</>
+				) : postState.posts.length === 0 ? (
+					<>
+						<p className='text-center lead'>
+							Sorry!! Not found any posts at this moment. You can add new post here!
+						</p>
+					</>
+				) : (
+					<div className='list-group'>
+						{posts &&
+							posts.map((post, index) => (
+								<div
+									key={post.id}
+									className='py-3 list-group-item d-flex align-items-center justify-content-evenly mb-3 border-top'
 								>
-									<i className='far fa-thumbs-up'></i>
-								</button>
-								<button
-									style={{ fontSize: '16px' }}
-									className='btn btn-sm btn-light mx-2'
-								>
-									<i className='far fa-thumbs-down'></i>
-								</button>
-								<Link
-									to='/posts/5fe326784snb326B'
-									style={{ fontSize: '13.5px', position: 'relative' }}
-									className='btn btn-sm btn-info ml-2 mr-3'
-								>
-									Discussions
-									<span
-										style={styles.discussionBadge}
-										className='bg-dark text-light text-center'
-									>
-										4
-									</span>
-								</Link>
-								<button
-									style={{ fontSize: '13.5px' }}
-									className='btn btn-sm btn-danger'
-								>
-									<i className='far fa-trash'></i>
-								</button>
-							</div>
-						</div>
+									<div className='text-center'>
+										<img
+											src='https://avatars3.githubusercontent.com/u/54589036?v=4'
+											alt=''
+											className='img-fluid'
+											style={styles.image}
+										/>
+										<h6 className='mt-1 text-primary'>{post.author_name}</h6>
+									</div>
+									<div style={{ flex: 1.5 }} className='ml-5'>
+										<p
+											style={{ fontSize: '13.5px' }}
+											className='mb-2 text-dark'
+											dangerouslySetInnerHTML={createMarkup(post.body)}
+										></p>
+										<small className='text-muted'>
+											Posted on <TimestampComponent timestamp={post.created_at} />
+										</small>
+										<div style={{ marginTop: '12px' }}>
+											<button style={{ fontSize: '16px' }} className='btn btn-sm btn-light'>
+												<i className={`${post.reaction === 1 ? 'fas' : 'far'} fa-thumbs-up`}></i>
+											</button>
+											<button style={{ fontSize: '16px' }} className='btn btn-sm btn-light mx-2'>
+												<i className={`${post.reaction === 0 ? 'fas' : 'far'} fa-thumbs-down`}></i>
+											</button>
+											<Link
+												to='/posts/5fe326784snb326B'
+												style={{ fontSize: '13.5px', position: 'relative' }}
+												className='btn btn-sm btn-info ml-2 mr-3'
+											>
+												Discussions
+												{post.comments > 0 ? (
+													<span
+														style={styles.discussionBadge}
+														className='bg-dark text-light text-center'
+													>
+														{post.comments < 10 ? post.comments : '9+'}
+													</span>
+												) : null}
+											</Link>
+											{user && post.author_id === user.id ? (
+												<button style={{ fontSize: '13.5px' }} className='btn btn-sm btn-danger'>
+													<i className='far fa-trash'></i>
+												</button>
+											) : null}
+										</div>
+									</div>
+								</div>
+							))}
 					</div>
-				</div>
+				)}
 			</div>
 		</PageContainer>
 	);
 };
-export default Login;
+
+const mapStateToProps = (state) => ({
+	postState: state.POSTS,
+	authState: state.AUTH_STATE,
+});
+
+export default connect(mapStateToProps, { fetchPosts })(Posts);

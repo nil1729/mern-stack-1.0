@@ -21,3 +21,12 @@ export const REMOVE_EXPERIENCE = 'REMOVE_EXPERIENCE';
 export const ADD_ALERTS = 'ADD_ALERTS';
 export const CLOSE_ALERT = 'CLOSE_ALERT';
 export const CLEAR_ALERTS = 'CLEAR_ALERTS';
+
+// Posts
+export const POST_LOADING = 'POST_LOADING';
+export const FETCH_POSTS = 'FETCH_POSTS';
+export const ADD_POST = 'ADD_POST';
+export const POST_REACTION = 'POST_REACTION';
+export const ADD_COMMENT = 'ADD_COMMENT';
+export const DELETE_POST = 'DELETE_POST';
+export const DELETE_COMMENT = 'DELETE_COMMENT';
