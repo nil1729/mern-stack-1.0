@@ -392,7 +392,8 @@ exports.addEducation = (req, res, next) => {
 		if (!checker.checkDate(ending_date, 'greater', starting_date))
 			errors.push('Please correctly mention the ending_date');
 	}
-	if (errors.length > 0) next(new ErrorResponse('Please provide valid Date(s)', 400, errors));
+	if (errors.length > 0)
+		return next(new ErrorResponse('Please provide valid Date(s)', 400, errors));
 
 	// if program description added
 	if (req.body.program_description)

@@ -6,6 +6,7 @@ import {
 	ADD_ALERTS,
 	USER_DEV_PROFILE_CREATE,
 	DEV_PROFILE_CHANGE,
+	ADD_NEW_CREDITS,
 } from '../types';
 
 import sendRequest from '../utils/axios-setup';
@@ -75,6 +76,50 @@ const updateDevProfile = (userID, data) => async (dispatch) => {
 	}
 };
 
+const addEducation = (userID, data) => async (dispatch) => {
+	try {
+		const res = await sendRequest.post(`/user/${userID}/profile/education`, data);
+
+		dispatch({
+			type: ADD_NEW_CREDITS,
+			payload: data,
+		});
+		dispatch({
+			type: ADD_ALERTS,
+			payload: res.data,
+		});
+		return true;
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+const addExperience = (userID, data) => async (dispatch) => {
+	try {
+		const res = await sendRequest.post(`/user/${userID}/profile/experience`, data);
+
+		dispatch({
+			type: ADD_NEW_CREDITS,
+			payload: data,
+		});
+		dispatch({
+			type: ADD_ALERTS,
+			payload: res.data,
+		});
+		return true;
+	} catch (e) {
+		console.log(e);
+	}
+};
+
 const clearUserProfile = () => async (dispatch) => dispatch({ type: CLEAR_USER_PROFILE });
 
-export { fetchDashboard, clearUserProfile, fetchDevProfile, createDevProfile, updateDevProfile };
+export {
+	fetchDashboard,
+	clearUserProfile,
+	fetchDevProfile,
+	createDevProfile,
+	updateDevProfile,
+	addEducation,
+	addExperience,
+};

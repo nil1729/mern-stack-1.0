@@ -46,8 +46,10 @@ const DurationComponent = ({ startingDate, endingDate }) => {
 const Developers = ({ authState: { isAuthenticated, user }, fetchDashboard, userProfileState }) => {
 	useEffect(() => {
 		if (user && userProfileState.dashboard === null) fetchDashboard(user.id);
+		if ((user && userProfileState.new_education) || userProfileState.new_experience)
+			fetchDashboard(user.id);
 		// eslint-disable-next-line
-	}, [isAuthenticated]);
+	}, [isAuthenticated, userProfileState]);
 
 	return (
 		<PageContainer className='container py-3 mb-5 auth__container'>

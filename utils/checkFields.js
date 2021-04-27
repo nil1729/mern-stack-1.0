@@ -18,18 +18,18 @@ class checker {
 		return false;
 	}
 	checkDate(...args) {
-		let dateToBeCheck = args[0];
+		let dateToBeCheck = new Date(`${args[0]} 00:00`);
 		let paramForDate = args[1];
 		let relDate = args[2];
-		if (!dateToBeCheck || !validator.isDate(dateToBeCheck)) return false;
+		if (!dateToBeCheck || isNaN(dateToBeCheck)) return false;
 
 		if (paramForDate) {
 			switch (paramForDate) {
 				case 'smaller':
-					if (new Date(dateToBeCheck) < new Date(relDate)) return true;
+					if (dateToBeCheck <= new Date(relDate)) return true;
 					else return false;
 				case 'greater':
-					if (new Date(dateToBeCheck) > new Date(relDate)) return true;
+					if (dateToBeCheck > new Date(relDate)) return true;
 					else return false;
 				default:
 					return false;

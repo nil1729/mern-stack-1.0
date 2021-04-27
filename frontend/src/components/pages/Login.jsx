@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import Spinner from 'react-bootstrap/Spinner';
 import { Link } from 'react-router-dom';
 import {
@@ -20,8 +20,13 @@ import { connect } from 'react-redux';
 import { signInUser } from '../../store/actions/auth';
 import checker from '../utils/checkFields';
 
-const Login = ({ authState: { isAuthenticated }, signInUser }) => {
+function useQuery() {
+	return new URLSearchParams(useLocation().search);
+}
+
+const Login = ({ authState: { isAuthenticated }, signInUser, ...rest }) => {
 	const history = useHistory();
+	const query = useQuery();
 
 	// Set Login initials Form state
 	const [submitted, setSubmitted] = useState(false);
@@ -29,7 +34,13 @@ const Login = ({ authState: { isAuthenticated }, signInUser }) => {
 	const [wrongUserInput, setWrongUserInput] = useState({ email: false });
 
 	useEffect(() => {
-		if (isAuthenticated) history.push('/dashboard');
+		if (isAuthenticated) {
+			if (query.get('redirect')) {
+				history.push(query.get('redirect'));
+				return;
+			}
+			history.push('/dashboard');
+		}
 		// eslint-disable-next-line
 	}, [isAuthenticated]);
 

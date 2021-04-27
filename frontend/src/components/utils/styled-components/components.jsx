@@ -45,7 +45,7 @@ const StyledTextArea = styled.textarea`
 	outline: none;
 	box-shadow: none !important;
 	border-radius: 0;
-	font-size: 0.75rem;
+	font-size: 0.9rem;
 	min-height: 100px;
 `;
 
