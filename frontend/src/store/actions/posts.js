@@ -63,4 +63,23 @@ const deletePostFromAccount = (id) => async (dispatch) => {
 	}
 };
 
-export { fetchPosts, addPost, deletePostFromAccount };
+const postReaction = (id, like) => async (dispatch) => {
+	try {
+		const res = await sendRequest.post(`/posts/${id}/reactions`, { reaction: like });
+		dispatch({
+			type: POST_REACTION,
+			payload: { id, reaction: like ? 1 : 0 },
+		});
+		dispatch({
+			type: ADD_ALERTS,
+			payload: res.data,
+		});
+	} catch (e) {
+		dispatch({
+			type: ADD_ALERTS,
+			payload: e.response && e.response.data,
+		});
+	}
+};
+
+export { fetchPosts, addPost, deletePostFromAccount, postReaction };

@@ -15,7 +15,12 @@ import {
 } from '../utils/styled-components/components';
 import Spinner from 'react-bootstrap/Spinner';
 import { connect } from 'react-redux';
-import { fetchPosts, addPost, deletePostFromAccount } from '../../store/actions/posts';
+import {
+	fetchPosts,
+	addPost,
+	deletePostFromAccount,
+	postReaction,
+} from '../../store/actions/posts';
 import moment from 'moment';
 
 const styles = {
@@ -58,6 +63,7 @@ const Posts = ({
 	fetchPosts,
 	addPost,
 	deletePostFromAccount,
+	postReaction,
 	postState,
 	authState: { isAuthenticated, user },
 }) => {
@@ -94,6 +100,16 @@ const Posts = ({
 			})
 		);
 		await deletePostFromAccount(id);
+	};
+
+	const reactOnPost = (id, like) => async () => {
+		setPosts(
+			posts.map((it) => {
+				if (it.id === id) return { ...it, reacting: true };
+				return it;
+			})
+		);
+		await postReaction(id, like);
 	};
 
 	return (
@@ -198,14 +214,16 @@ const Posts = ({
 										</small>
 										<div style={{ marginTop: '12px' }}>
 											<button
-												disabled={(user && user.new_account) || post.deleting}
+												onClick={reactOnPost(post.id, true)}
+												disabled={(user && user.new_account) || post.deleting || post.reacting}
 												style={{ fontSize: '16px' }}
 												className='btn btn-sm btn-light'
 											>
 												<i className={`${post.reaction === 1 ? 'fas' : 'far'} fa-thumbs-up`}></i>
 											</button>
 											<button
-												disabled={(user && user.new_account) || post.deleting}
+												onClick={reactOnPost(post.id, false)}
+												disabled={(user && user.new_account) || post.deleting || post.reacting}
 												style={{ fontSize: '16px' }}
 												className='btn btn-sm btn-light mx-2'
 											>
@@ -269,4 +287,9 @@ const mapStateToProps = (state) => ({
 	authState: state.AUTH_STATE,
 });
 
-export default connect(mapStateToProps, { fetchPosts, addPost, deletePostFromAccount })(Posts);
+export default connect(mapStateToProps, {
+	fetchPosts,
+	addPost,
+	deletePostFromAccount,
+	postReaction,
+})(Posts);

@@ -30,7 +30,18 @@ const postReducers = (state = initialState, action) => {
 				posts: [action.payload, ...state.posts],
 			};
 		case POST_REACTION:
-			return action.payload;
+			return {
+				...state,
+				posts: state.posts.map((it) => {
+					if (it.id === action.payload.id)
+						return {
+							...it,
+							reacting: undefined,
+							reaction: action.payload.reaction === it.reaction ? null : action.payload.reaction,
+						};
+					return it;
+				}),
+			};
 		case ADD_COMMENT:
 			return initialState;
 		case DELETE_POST:
