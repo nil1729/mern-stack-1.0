@@ -64,7 +64,7 @@ exports.addComment = (data, res, next) => {
 
 		query = `
 			SELECT 
-				c.body as body, 
+				c.body as body, c.post_id,
 				c.id, c.user_id as author_id, c.created_at, 
 				up.github_username, u.name as author_name
 			FROM POST_COMMENTS c

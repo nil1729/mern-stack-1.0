@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import {
 	PageContainer,
 	StyledTextArea,
@@ -20,6 +20,9 @@ import {
 	getSinglePostWithComments,
 	addComment,
 	deleteCommentFromAccount,
+	postReaction,
+	deletePostFromAccount,
+	clearDeletedSinglePostState,
 } from '../../store/actions/posts';
 import Spinner from 'react-bootstrap/Spinner';
 
@@ -51,9 +54,13 @@ const ViewPost = ({
 	getSinglePostWithComments,
 	addComment,
 	deleteCommentFromAccount,
+	postReaction,
+	deletePostFromAccount,
+	clearDeletedSinglePostState,
 	authState: { user, isAuthenticated },
 	postState: { singlePost },
 }) => {
+	const history = useHistory();
 	const { postID } = useParams();
 	const [currentPost, setCurrentPost] = useState(null);
 	const [comments, setComments] = useState(null);
@@ -62,16 +69,18 @@ const ViewPost = ({
 	const [submitted, setSubmitted] = useState(false);
 
 	useEffect(() => {
-		if (user && !singlePost.postDetails) {
+		if (user && !singlePost.deleted && !singlePost.postDetails) {
 			getSinglePostWithComments(postID);
 		} else if (
 			user &&
+			!singlePost.deleted &&
 			singlePost.postDetails &&
 			String(singlePost.postDetails.post.id) !== postID
 		) {
 			getSinglePostWithComments(postID);
 		} else if (
 			user &&
+			!singlePost.deleted &&
 			singlePost.postDetails.post &&
 			String(singlePost.postDetails.post.id) === postID &&
 			Object.keys(singlePost.postDetails.post).length > 1
@@ -79,6 +88,7 @@ const ViewPost = ({
 			setCurrentPost(singlePost.postDetails.post);
 			setComments(singlePost.postDetails.comments);
 		}
+		// eslint-disable-next-line
 	}, [isAuthenticated, singlePost.postDetails]);
 
 	// Submit Handling
@@ -107,6 +117,18 @@ const ViewPost = ({
 				})
 		);
 		await deleteCommentFromAccount(currentPost.id, id);
+	};
+
+	const reactOnPost = (like) => async () => {
+		setCurrentPost({ ...currentPost, reacting: true });
+		await postReaction(currentPost.id, like);
+	};
+
+	const deleteCurrentPost = async () => {
+		setCurrentPost({ ...currentPost, deleting: true });
+		await deletePostFromAccount(currentPost.id);
+		history.push('/posts');
+		clearDeletedSinglePostState();
 	};
 
 	return (
@@ -160,6 +182,7 @@ const ViewPost = ({
 									</small>
 									<div style={{ marginTop: '12px' }}>
 										<button
+											onClick={reactOnPost(true)}
 											disabled={
 												(user && user.new_account) || currentPost.deleting || currentPost.reacting
 											}
@@ -171,6 +194,7 @@ const ViewPost = ({
 											></i>
 										</button>
 										<button
+											onClick={reactOnPost(false)}
 											disabled={
 												(user && user.new_account) || currentPost.deleting || currentPost.reacting
 											}
@@ -181,8 +205,28 @@ const ViewPost = ({
 												className={`${currentPost.reaction === 0 ? 'fas' : 'far'} fa-thumbs-down`}
 											></i>
 										</button>
-										<button style={{ fontSize: '13px' }} className='btn btn-sm btn-danger'>
-											<i className='fas fa-trash mr-2'></i> Remove
+										<button
+											onClick={deleteCurrentPost}
+											disabled={currentPost.deleting}
+											style={{ fontSize: '13px' }}
+											className='btn btn-sm btn-danger'
+										>
+											{currentPost.deleting ? (
+												<>
+													Removing... {'	'}
+													<Spinner
+														as='span'
+														animation='border'
+														size='sm'
+														role='status'
+														aria-hidden='true'
+													/>
+												</>
+											) : (
+												<>
+													<i className='fas fa-trash mr-2'></i> Remove
+												</>
+											)}{' '}
 										</button>
 									</div>
 								</div>
@@ -193,6 +237,7 @@ const ViewPost = ({
 					{user && !user.new_account ? (
 						<form style={{ fontSize: '14px' }} onSubmit={submitHandler}>
 							<StyledTextArea
+								disabled={submitted || currentPost.deleting}
 								value={newCommentBody}
 								onChange={(e) => {
 									setNewCommentBody(e.target.value);
@@ -208,7 +253,11 @@ const ViewPost = ({
 									Please write some text to add new comment
 								</StyledInputErrorMessage>
 							) : null}
-							<button disabled={submitted} type='submit' className='btn btn-dark btn-sm mt-1'>
+							<button
+								disabled={submitted || currentPost.deleting}
+								type='submit'
+								className='btn btn-dark btn-sm mt-1'
+							>
 								{submitted ? (
 									<>
 										Adding... {'	'}
@@ -275,7 +324,7 @@ const ViewPost = ({
 													{comment.author_id === user.id ? (
 														<button
 															onClick={deleteComment(comment.id)}
-															disabled={comment.deleting}
+															disabled={comment.deleting || currentPost.deleting}
 															style={{ fontSize: '13px' }}
 															className='btn btn-sm btn-danger'
 														>
@@ -315,4 +364,7 @@ export default connect(mapStateToProps, {
 	getSinglePostWithComments,
 	addComment,
 	deleteCommentFromAccount,
+	postReaction,
+	deletePostFromAccount,
+	clearDeletedSinglePostState,
 })(ViewPost);

@@ -9,6 +9,7 @@ import {
 	DELETE_COMMENT,
 	GET_SINGLE_POST,
 	SINGLE_POST_LOADER,
+	CLEAR_DELETED_SINGLE_POST_STATE,
 } from '../types';
 
 // Initial Auth State
@@ -44,11 +45,33 @@ const postReducers = (state = initialState, action) => {
 						};
 					return it;
 				}),
+				singlePost: state.singlePost.postDetails
+					? {
+							...state.singlePost,
+							postDetails: {
+								...state.singlePost.postDetails,
+								post:
+									state.singlePost.postDetails.post.id === action.payload.id
+										? {
+												...state.singlePost.postDetails.post,
+												reaction:
+													action.payload.reaction === state.singlePost.postDetails.post.reaction
+														? null
+														: action.payload.reaction,
+										  }
+										: state.singlePost.postDetails.post,
+							},
+					  }
+					: state.singlePost,
 			};
 		case DELETE_POST:
 			return {
 				...state,
 				posts: state.posts.filter((it) => it.id !== action.payload),
+				singlePost:
+					state.singlePost.postDetails && state.singlePost.postDetails.post.id === action.payload
+						? { ...initialState.singlePost, deleted: true }
+						: state.singlePost,
 			};
 		case SINGLE_POST_LOADER:
 			return {
@@ -66,6 +89,10 @@ const postReducers = (state = initialState, action) => {
 		case ADD_COMMENT:
 			return {
 				...state,
+				posts: state.posts.map((it) => {
+					if (it.id === action.payload.post_id) return { ...it, comments: it.comments + 1 };
+					return it;
+				}),
 				singlePost: {
 					...state.singlePost,
 					postDetails: {
@@ -77,15 +104,25 @@ const postReducers = (state = initialState, action) => {
 		case DELETE_COMMENT:
 			return {
 				...state,
+				posts: state.posts.map((it) => {
+					if (it.id === action.payload.postID)
+						return { ...it, comments: it.comments > 0 ? it.comments - 1 : 0 };
+					return it;
+				}),
 				singlePost: {
 					...state.singlePost,
 					postDetails: {
 						...state.singlePost.postDetails,
 						comments: state.singlePost.postDetails.comments.filter(
-							(it) => it.id !== action.payload
+							(it) => it.id !== action.payload.commentID
 						),
 					},
 				},
+			};
+		case CLEAR_DELETED_SINGLE_POST_STATE:
+			return {
+				...state,
+				singlePost: initialState.singlePost,
 			};
 		default: {
 			return state;

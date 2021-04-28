@@ -10,6 +10,7 @@ import {
 	ADD_ALERTS,
 	GET_SINGLE_POST,
 	SINGLE_POST_LOADER,
+	CLEAR_DELETED_SINGLE_POST_STATE,
 } from '../types';
 
 import sendRequest from '../utils/axios-setup';
@@ -57,7 +58,9 @@ const deletePostFromAccount = (id) => async (dispatch) => {
 			type: ADD_ALERTS,
 			payload: res.data,
 		});
+		return true;
 	} catch (e) {
+		console.log(e);
 		dispatch({
 			type: ADD_ALERTS,
 			payload: e.response && e.response.data,
@@ -132,7 +135,7 @@ const deleteCommentFromAccount = (postID, commentID) => async (dispatch) => {
 		const res = await sendRequest.delete(`/posts/${postID}/comments/${commentID}`);
 		dispatch({
 			type: DELETE_COMMENT,
-			payload: commentID,
+			payload: { postID, commentID },
 		});
 		dispatch({
 			type: ADD_ALERTS,
@@ -146,6 +149,9 @@ const deleteCommentFromAccount = (postID, commentID) => async (dispatch) => {
 	}
 };
 
+const clearDeletedSinglePostState = () => async (dispatch) =>
+	dispatch({ type: CLEAR_DELETED_SINGLE_POST_STATE });
+
 export {
 	fetchPosts,
 	addPost,
@@ -154,4 +160,5 @@ export {
 	getSinglePostWithComments,
 	addComment,
 	deleteCommentFromAccount,
+	clearDeletedSinglePostState,
 };
