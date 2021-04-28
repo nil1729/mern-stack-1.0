@@ -1,6 +1,5 @@
 // Action Types
 import {
-	POST_LOADING,
 	FETCH_POSTS,
 	ADD_POST,
 	POST_REACTION,
@@ -10,7 +9,6 @@ import {
 	ADD_ALERTS,
 	GET_SINGLE_POST,
 	SINGLE_POST_LOADER,
-	CLEAR_DELETED_SINGLE_POST_STATE,
 } from '../types';
 
 import sendRequest from '../utils/axios-setup';
@@ -149,9 +147,6 @@ const deleteCommentFromAccount = (postID, commentID) => async (dispatch) => {
 	}
 };
 
-const clearDeletedSinglePostState = () => async (dispatch) =>
-	dispatch({ type: CLEAR_DELETED_SINGLE_POST_STATE });
-
 export {
 	fetchPosts,
 	addPost,
@@ -160,5 +155,4 @@ export {
 	getSinglePostWithComments,
 	addComment,
 	deleteCommentFromAccount,
-	clearDeletedSinglePostState,
 };

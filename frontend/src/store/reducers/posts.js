@@ -1,6 +1,5 @@
 // Action Types
 import {
-	POST_LOADING,
 	FETCH_POSTS,
 	ADD_POST,
 	POST_REACTION,
@@ -9,7 +8,6 @@ import {
 	DELETE_COMMENT,
 	GET_SINGLE_POST,
 	SINGLE_POST_LOADER,
-	CLEAR_DELETED_SINGLE_POST_STATE,
 } from '../types';
 
 // Initial Auth State
@@ -68,10 +66,6 @@ const postReducers = (state = initialState, action) => {
 			return {
 				...state,
 				posts: state.posts.filter((it) => it.id !== action.payload),
-				singlePost:
-					state.singlePost.postDetails && state.singlePost.postDetails.post.id === action.payload
-						? { ...initialState.singlePost, deleted: true }
-						: state.singlePost,
 			};
 		case SINGLE_POST_LOADER:
 			return {
@@ -109,20 +103,6 @@ const postReducers = (state = initialState, action) => {
 						return { ...it, comments: it.comments > 0 ? it.comments - 1 : 0 };
 					return it;
 				}),
-				singlePost: {
-					...state.singlePost,
-					postDetails: {
-						...state.singlePost.postDetails,
-						comments: state.singlePost.postDetails.comments.filter(
-							(it) => it.id !== action.payload.commentID
-						),
-					},
-				},
-			};
-		case CLEAR_DELETED_SINGLE_POST_STATE:
-			return {
-				...state,
-				singlePost: initialState.singlePost,
 			};
 		default: {
 			return state;

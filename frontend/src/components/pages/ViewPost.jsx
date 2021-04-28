@@ -22,7 +22,6 @@ import {
 	deleteCommentFromAccount,
 	postReaction,
 	deletePostFromAccount,
-	clearDeletedSinglePostState,
 } from '../../store/actions/posts';
 import Spinner from 'react-bootstrap/Spinner';
 
@@ -56,7 +55,6 @@ const ViewPost = ({
 	deleteCommentFromAccount,
 	postReaction,
 	deletePostFromAccount,
-	clearDeletedSinglePostState,
 	authState: { user, isAuthenticated },
 	postState: { singlePost },
 }) => {
@@ -69,18 +67,16 @@ const ViewPost = ({
 	const [submitted, setSubmitted] = useState(false);
 
 	useEffect(() => {
-		if (user && !singlePost.deleted && !singlePost.postDetails) {
+		if (user && !singlePost.postDetails) {
 			getSinglePostWithComments(postID);
 		} else if (
 			user &&
-			!singlePost.deleted &&
 			singlePost.postDetails &&
 			String(singlePost.postDetails.post.id) !== postID
 		) {
 			getSinglePostWithComments(postID);
 		} else if (
 			user &&
-			!singlePost.deleted &&
 			singlePost.postDetails.post &&
 			String(singlePost.postDetails.post.id) === postID &&
 			Object.keys(singlePost.postDetails.post).length > 1
@@ -128,7 +124,6 @@ const ViewPost = ({
 		setCurrentPost({ ...currentPost, deleting: true });
 		await deletePostFromAccount(currentPost.id);
 		history.push('/posts');
-		clearDeletedSinglePostState();
 	};
 
 	return (
@@ -366,5 +361,4 @@ export default connect(mapStateToProps, {
 	deleteCommentFromAccount,
 	postReaction,
 	deletePostFromAccount,
-	clearDeletedSinglePostState,
 })(ViewPost);
