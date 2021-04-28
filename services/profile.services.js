@@ -64,7 +64,7 @@ exports.updateProfile = (data, res, next) => {
 	});
 };
 
-exports.getProfile = (user_id, fields, res, next) => {
+exports.getProfile = (username, fields, res, next) => {
 	// Create string for select fields
 	let queryFields = ``;
 	fields.publicUserFields.forEach((field) => (queryFields += `${field},`));
@@ -76,7 +76,7 @@ exports.getProfile = (user_id, fields, res, next) => {
 			${queryFields}
 		FROM USERS
 		INNER JOIN USER_PROFILES ON USERS.ID = USER_PROFILES.USER_ID
-		WHERE USERS.ID = ${user_id};
+		WHERE USERS.USERNAME = "${username}";
 	`;
 
 	let user_profile, user_job_experiences, user_education_credits;
@@ -97,9 +97,12 @@ exports.getProfile = (user_id, fields, res, next) => {
 		// Create query for getting user profile details
 		query = `
 			SELECT 
+				id,
 				${queryFields}
-			FROM USER_EXPERIENCES
-			WHERE USER_ID = ${user_id};
+			FROM USER_EXPERIENCES ue
+			WHERE USER_ID = ${user_profile.dev_id}
+			ORDER BY ue.id DESC
+			LIMIT 0, 2;
 		`;
 
 		// execute the query
@@ -116,9 +119,12 @@ exports.getProfile = (user_id, fields, res, next) => {
 			// Create query for getting user profile details
 			query = `
 				SELECT 
+					id,
 					${queryFields}
-				FROM USER_EDUCATIONS
-				WHERE USER_ID = ${user_id};
+				FROM USER_EDUCATIONS ue
+				WHERE USER_ID = ${user_profile.dev_id}
+				ORDER BY ue.id DESC
+				LIMIT 0, 2;
 			`;
 
 			// execute the query
@@ -130,9 +136,7 @@ exports.getProfile = (user_id, fields, res, next) => {
 				// Send responses to client
 				return res.status(200).json({
 					success: true,
-					user_profile,
-					user_job_experiences,
-					user_education_credits,
+					results: { user_profile, user_job_experiences, user_education_credits },
 				});
 			});
 		});

@@ -112,6 +112,10 @@ const AvatarImage = ({ name, colorCode, imageURL, size }) => {
 			width = 60;
 			fontSize = 25;
 			break;
+		case 'lg':
+			height = 125;
+			width = 125;
+			fontSize = 45;
 		default:
 			break;
 	}

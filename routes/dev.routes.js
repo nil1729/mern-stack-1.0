@@ -1,5 +1,6 @@
 const express = require('express'),
 	router = express.Router(),
+	{ profileHandler } = require('../controllers/profile.controllers'),
 	{ checkAuthentication } = require('../middleware/auth.middleware');
 
 router.get('/', checkAuthentication, (req, res, next) => {
@@ -33,5 +34,7 @@ router.get('/', checkAuthentication, (req, res, next) => {
 		});
 	});
 });
+
+router.get('/:username', checkAuthentication, profileHandler);
 
 module.exports = router;

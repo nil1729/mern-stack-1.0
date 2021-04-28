@@ -42,7 +42,7 @@ const App = ({ loadUser }) => {
 				{/* Public Routes */}
 				<Route path='/' exact component={Home} />
 				<Route path='/developers' exact component={Developers} />
-				<Route path='/developers/:id' exact component={ViewProfile} />
+				<Route path='/developers/:username' exact component={ViewProfile} />
 				<Route path='/register' exact component={Register} />
 				<Route path='/login' exact component={Login} />
 				{/* Private Routes */}

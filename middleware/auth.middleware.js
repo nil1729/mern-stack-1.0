@@ -2,7 +2,12 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('../middleware/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
-const partiallyProtectedRoute = [/\/user\/(\d+)\/profile$/, /\/posts$/, /\/developers$/];
+const partiallyProtectedRoute = [
+	/\/user\/(\d+)\/profile$/,
+	/\/posts$/,
+	/\/developers$/,
+	/\/developers\/([a-z1-9.]+)$/,
+];
 
 exports.checkAuthentication = asyncHandler((req, res, next) => {
 	// Proceed for authentication

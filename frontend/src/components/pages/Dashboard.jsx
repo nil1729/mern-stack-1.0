@@ -142,41 +142,42 @@ const Developers = ({
 							</tr>
 						) : (
 							<>
-								{experiences.map((exp, index) => (
-									<tr key={exp.id}>
-										<TableItem>{exp.company_name}</TableItem>
-										<TableItem>{exp.job_title}</TableItem>
-										<DurationComponent
-											startingDate={exp.starting_date}
-											endingDate={exp.ending_date}
-										/>
-										<TableItem>
-											<button
-												disabled={exp.deleting}
-												style={{ fontSize: '13px' }}
-												className='btn btn-danger btn-sm'
-												onClick={deleteCredit(exp.id, 'exp')}
-											>
-												{exp.deleting ? (
-													<>
-														Removing... {'	'}
-														<Spinner
-															as='span'
-															animation='border'
-															size='sm'
-															role='status'
-															aria-hidden='true'
-														/>
-													</>
-												) : (
-													<>
-														Delete<i className='fas fa-trash ml-1'></i>
-													</>
-												)}{' '}
-											</button>
-										</TableItem>
-									</tr>
-								))}
+								{experiences &&
+									experiences.map((exp, index) => (
+										<tr key={exp.id}>
+											<TableItem>{exp.company_name}</TableItem>
+											<TableItem>{exp.job_title}</TableItem>
+											<DurationComponent
+												startingDate={exp.starting_date}
+												endingDate={exp.ending_date}
+											/>
+											<TableItem>
+												<button
+													disabled={exp.deleting}
+													style={{ fontSize: '13px' }}
+													className='btn btn-danger btn-sm'
+													onClick={deleteCredit(exp.id, 'exp')}
+												>
+													{exp.deleting ? (
+														<>
+															Removing... {'	'}
+															<Spinner
+																as='span'
+																animation='border'
+																size='sm'
+																role='status'
+																aria-hidden='true'
+															/>
+														</>
+													) : (
+														<>
+															Delete<i className='fas fa-trash ml-1'></i>
+														</>
+													)}{' '}
+												</button>
+											</TableItem>
+										</tr>
+									))}
 							</>
 						)}
 					</tbody>
@@ -218,41 +219,42 @@ const Developers = ({
 							</tr>
 						) : (
 							<>
-								{educations.map((edu, index) => (
-									<tr key={edu.id}>
-										<TableItem>{edu.school_name}</TableItem>
-										<TableItem>{edu.degree}</TableItem>
-										<DurationComponent
-											startingDate={edu.starting_date}
-											endingDate={edu.ending_date}
-										/>
-										<TableItem>
-											<button
-												disabled={edu.deleting}
-												onClick={deleteCredit(edu.id, 'edu')}
-												style={{ fontSize: '13px' }}
-												className='btn btn-danger btn-sm'
-											>
-												{edu.deleting ? (
-													<>
-														Removing... {'	'}
-														<Spinner
-															as='span'
-															animation='border'
-															size='sm'
-															role='status'
-															aria-hidden='true'
-														/>
-													</>
-												) : (
-													<>
-														Delete<i className='fas fa-trash ml-1'></i>
-													</>
-												)}
-											</button>
-										</TableItem>
-									</tr>
-								))}
+								{educations &&
+									educations.map((edu, index) => (
+										<tr key={edu.id}>
+											<TableItem>{edu.school_name}</TableItem>
+											<TableItem>{edu.degree}</TableItem>
+											<DurationComponent
+												startingDate={edu.starting_date}
+												endingDate={edu.ending_date}
+											/>
+											<TableItem>
+												<button
+													disabled={edu.deleting}
+													onClick={deleteCredit(edu.id, 'edu')}
+													style={{ fontSize: '13px' }}
+													className='btn btn-danger btn-sm'
+												>
+													{edu.deleting ? (
+														<>
+															Removing... {'	'}
+															<Spinner
+																as='span'
+																animation='border'
+																size='sm'
+																role='status'
+																aria-hidden='true'
+															/>
+														</>
+													) : (
+														<>
+															Delete<i className='fas fa-trash ml-1'></i>
+														</>
+													)}
+												</button>
+											</TableItem>
+										</tr>
+									))}
 							</>
 						)}
 					</tbody>

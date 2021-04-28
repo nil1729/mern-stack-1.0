@@ -166,11 +166,12 @@ exports.profileHandler = (req, res, next) => {
 		let publicUserFields = [
 			'name',
 			'username',
-			'users.id',
+			'avatar_colour_code',
+			'users.id as dev_id',
 			'current_position',
 			'current_working_place_name',
 			'skills',
-			'github_username',
+			'profile_image_url',
 			'bio',
 			'website_url',
 			'twitter_url',
@@ -194,7 +195,7 @@ exports.profileHandler = (req, res, next) => {
 		}
 		// Call Get profile Service
 		getProfile(
-			req.params.user_id,
+			req.params.username,
 			{
 				publicUserFields,
 				publicJobFields,
