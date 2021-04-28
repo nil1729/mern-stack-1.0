@@ -1,7 +1,6 @@
 import {
 	FETCH_DASHBOARD,
 	USER_PROFILE_LOADING_START,
-	CLEAR_USER_PROFILE,
 	GET_DEV_PROFILE,
 	ADD_ALERTS,
 	USER_DEV_PROFILE_CREATE,
@@ -139,11 +138,8 @@ const deleteCreditFromAccount = (userID, id, creditType) => async (dispatch) => 
 	}
 };
 
-const clearUserProfile = () => async (dispatch) => dispatch({ type: CLEAR_USER_PROFILE });
-
 export {
 	fetchDashboard,
-	clearUserProfile,
 	fetchDevProfile,
 	createDevProfile,
 	updateDevProfile,

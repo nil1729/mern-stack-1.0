@@ -14,6 +14,7 @@ import {
 	GreyLinkButton,
 	TimestampComponent,
 	StyledInputErrorMessage,
+	AvatarImage,
 } from '../utils/styled-components/components';
 import { connect } from 'react-redux';
 import {
@@ -158,13 +159,19 @@ const ViewPost = ({
 						<div className='list-group'>
 							<div className='py-3 list-group-item d-flex align-items-center justify-content-evenly'>
 								<div className='text-center'>
-									<img
-										src='https://avatars3.githubusercontent.com/u/54589036?v=4'
-										alt=''
-										className='img-fluid'
-										style={styles.postAvatar}
+									<AvatarImage
+										name={currentPost.author_name}
+										colorCode={currentPost.author_avatar_color}
+										imageURL={''}
 									/>
-									<h6 className='mt-1 text-primary'>{currentPost.author_name}</h6>
+									<h6
+										className='mt-2 text-primary text-capitalize'
+										style={{ whiteSpace: 'nowrap' }}
+									>
+										{currentPost.author_name.length > 12
+											? currentPost.author_name.substr(0, 12).concat('...')
+											: currentPost.author_name}
+									</h6>
 								</div>
 								<div style={{ flex: 1.5 }} className='ml-5'>
 									<p
@@ -287,14 +294,20 @@ const ViewPost = ({
 										key={comment.id}
 										className='py-3 list-group-item d-flex align-items-center justify-content-evenly border-top mb-3'
 									>
-										<div className='text-center'>
-											<img
-												src='https://avatars3.githubusercontent.com/u/54589036?v=4'
-												alt=''
-												className='img-fluid'
-												style={styles.commentAvatar}
+										<div className='text-center' style={{ flex: 0.25 }}>
+											<AvatarImage
+												name={comment.author_name}
+												colorCode={comment.author_avatar_color}
+												size='sm'
 											/>
-											<p className='mt-2 text-secondary mb-0'>{comment.author_name}</p>
+											<p
+												className='mt-1 text-secondary mb-0 text-capitalize'
+												style={{ whiteSpace: 'nowrap' }}
+											>
+												{comment.author_name.length > 10
+													? comment.author_name.substr(0, 10).concat('...')
+													: comment.author_name}
+											</p>
 										</div>
 										<div style={{ flex: 1.5 }} className='ml-5'>
 											<p

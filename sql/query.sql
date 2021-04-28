@@ -26,3 +26,17 @@ select
     up.current_working_place_name, up.current_position, up.skills
     from users u
     inner join user_profiles up on u.id = up.user_id;
+    height: 75px;
+    width: 75px;
+    background-color: #7c6dd1;
+    position: relative;
+    vertical-align: middle;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 30px;
+    color: white;
+    font-weight: 100;
+    letter-spacing: 1px;

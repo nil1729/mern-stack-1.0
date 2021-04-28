@@ -4,9 +4,8 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import { NavLink } from 'react-router-dom';
 import { logOut } from '../../store/actions/auth';
-import { clearUserProfile } from '../../store/actions/user_profile';
 
-const Navigation = ({ authState, logOut, clearUserProfile }) => {
+const Navigation = ({ authState, logOut }) => {
 	return (
 		<>
 			<Navbar sticky='top' bg='dark' variant='dark' className='py-2 px-5'>
@@ -52,14 +51,7 @@ const Navigation = ({ authState, logOut, clearUserProfile }) => {
 											</NavLink>
 										</Nav.Item>
 										<Nav.Item>
-											<NavLink
-												className='nav-link log_out_link'
-												to='/logout'
-												onClick={() => {
-													logOut();
-													clearUserProfile();
-												}}
-											>
+											<NavLink className='nav-link log_out_link' to='/logout' onClick={logOut}>
 												<i className='far fa-sign-out mr-1'></i>Logout
 											</NavLink>
 										</Nav.Item>
@@ -78,4 +70,4 @@ const mapStateToProps = (state) => ({
 	authState: state.AUTH_STATE,
 });
 
-export default connect(mapStateToProps, { logOut, clearUserProfile })(Navigation);
+export default connect(mapStateToProps, { logOut })(Navigation);

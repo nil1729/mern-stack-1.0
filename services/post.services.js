@@ -1,7 +1,7 @@
 exports.addPost = (data, res, next) => {
 	let query = `
         INSERT INTO POSTS(body, user_id)
-            VALUES("${data.body}", ${data.user.id});
+            VALUES(${data.body}, ${data.user.id});
     `;
 
 	// execute the query
@@ -12,7 +12,9 @@ exports.addPost = (data, res, next) => {
 			SELECT 
 				concat(substr(p.body, 1, 300), "....") as body, 
 				p.id, p.user_id as author_id, p.created_at, 
-				up.github_username, u.name as author_name,
+				up.profile_image_url as author_dp_url, 
+				u.avatar_colour_code as author_avatar_color, 
+				u.name as author_name,
 				max(r.reaction) as reaction,
 				count(c.id) as comments
 			FROM POSTS p
@@ -55,7 +57,7 @@ exports.updatePost = (data, res, next) => {
 exports.addComment = (data, res, next) => {
 	let query = `
         INSERT INTO POST_COMMENTS(body, user_id,post_id)
-            VALUES("${data.body}", ${data.user.id}, ${data.post_id});
+            VALUES(${data.body}, ${data.user.id}, ${data.post_id});
     `;
 
 	// execute the query
@@ -66,7 +68,9 @@ exports.addComment = (data, res, next) => {
 			SELECT 
 				c.body as body, c.post_id,
 				c.id, c.user_id as author_id, c.created_at, 
-				up.github_username, u.name as author_name
+				up.profile_image_url as author_dp_url, 
+				u.avatar_colour_code as author_avatar_color, 
+				u.name as author_name
 			FROM POST_COMMENTS c
 			INNER JOIN USER_PROFILES up ON c.user_id = up.user_id
 			INNER JOIN USERS u ON u.id = c.user_id

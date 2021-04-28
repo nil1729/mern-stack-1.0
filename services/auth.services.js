@@ -2,6 +2,16 @@ const bcrypt = require('bcrypt');
 const ErrorResponse = require('../utils/errorResponse');
 const jwt = require('jsonwebtoken');
 
+// Function Color Code
+function getRandomColor() {
+	var letters = '0123456789ABCDEF';
+	var color = '#';
+	for (var i = 0; i < 6; i++) {
+		color += letters[Math.floor(Math.random() * 16)];
+	}
+	return color;
+}
+
 // Sign up service
 const signUp = (data, res, next) => {
 	let { name, email, password } = data;
@@ -40,9 +50,14 @@ const signUp = (data, res, next) => {
 				let username = name.replace(/\s/g, '.').toLowerCase();
 				if (result[0].num > 1) username += result[0].num;
 
+				const avatarColourCode = getRandomColor();
+
 				// Update User with unique username
 				query = `
-						UPDATE USERS SET USERNAME = "${username}" WHERE EMAIL_ADDRESS = "${email}";
+						UPDATE USERS SET 
+							USERNAME = "${username}",
+							AVATAR_COLOUR_CODE = "${avatarColourCode}"
+						WHERE EMAIL_ADDRESS = "${email}";
 					`;
 				db.query(query, (err) => {
 					if (err) return next(err);
@@ -55,7 +70,7 @@ const signUp = (data, res, next) => {
 							verification_email_sent,
 							new_account,
 							created_at, updated_at, 
-							password 
+							avatar_colour_code 
 						FROM USERS WHERE email_address = "${email}";
 					`;
 
@@ -68,10 +83,7 @@ const signUp = (data, res, next) => {
 								email,
 							},
 							message: 'User registration successful. Kindly verify your email address',
-							user: {
-								...result[0],
-								password: undefined,
-							},
+							user: result[0],
 						};
 
 						// create Token and send with cookies

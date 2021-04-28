@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
+import checker from '../checkFields';
 
 const PageContainer = styled.div`
 	width: 65%;
@@ -101,6 +102,62 @@ const TimestampComponent = ({ timestamp }) => {
 	);
 };
 
+const AvatarImage = ({ name, colorCode, imageURL, size }) => {
+	let height = 75;
+	let width = 75;
+	let fontSize = 30;
+	switch (size) {
+		case 'sm':
+			height = 60;
+			width = 60;
+			fontSize = 25;
+			break;
+		default:
+			break;
+	}
+	// convert to string
+	height += 'px';
+	width += 'px';
+	fontSize += 'px';
+
+	return (
+		<>
+			<style type='text/css'>
+				{`
+					.avatar__container {
+						margin: auto;
+						overflow: hidden;
+						border-radius: 50%;
+					}
+					.user__short__name {
+						height: 100%;
+						color: #ffffff;
+						letter-spacing: 1px;
+						display: flex;
+						justify-content: center;
+						align-items: center;
+					}
+				`}
+			</style>
+			<div className='avatar__container' style={{ height, width }}>
+				{imageURL && checker.siteURL(imageURL) ? (
+					<img src={imageURL} alt='' className='img-fluid' />
+				) : (
+					<div
+						className='user__short__name text-uppercase'
+						style={{ fontSize, backgroundColor: colorCode }}
+					>
+						{name
+							.split(' ')
+							.map((it) => it.slice(0, 1))
+							.join('')}
+					</div>
+				)}
+			</div>
+		</>
+	);
+};
+
 export {
 	PageContainer,
 	StyledInput,
@@ -113,4 +170,5 @@ export {
 	TableItem,
 	StyledInputGroupText,
 	TimestampComponent,
+	AvatarImage,
 };

@@ -7,6 +7,8 @@ import {
 	ADD_ALERTS,
 	AUTH_ERROR,
 	CLEAR_ALERTS,
+	CLEAR_POST_STATE,
+	CLEAR_USER_PROFILE,
 } from '../types';
 import sendRequest, { setAuthToken } from '../utils/axios-setup';
 
@@ -117,6 +119,8 @@ const signUpUser = ({ name, email, password }) => async (dispatch) => {
 const logOut = () => async (dispatch) => {
 	dispatch({ type: CLEAR_ALERTS });
 	dispatch({ type: LOG_OUT });
+	dispatch({ type: CLEAR_USER_PROFILE });
+	dispatch({ type: CLEAR_POST_STATE });
 };
 
 export { signInUser, loadUser, logOut, signUpUser };

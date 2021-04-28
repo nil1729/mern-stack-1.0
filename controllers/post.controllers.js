@@ -28,11 +28,14 @@ exports.addPostHandler = (req, res, next) => {
 	// Filter the body for XSS Protection
 	body = xss(body);
 
+	// Replace all `"` or `'` with `\'` & `\"`
+	body = JSON.stringify(body);
+
 	// Checking For Duplicates
 	let query = `
         SELECT COUNT(*) as duplicatePost 
 			FROM POSTS 
-			WHERE body = "${body}" && 
+			WHERE body = ${body} && 
 				user_id=${req.user.id};
     `;
 
@@ -119,6 +122,9 @@ exports.addCommentHandler = (req, res, next) => {
 	// Filter the body for XSS Protection
 	body = xss(body);
 
+	// Replace all `"` or `'` with `\'` & `\"`
+	body = JSON.stringify(body);
+
 	// Checking For Duplicates
 	let query = `
         SELECT COUNT(id) as postCount 
@@ -137,7 +143,7 @@ exports.addCommentHandler = (req, res, next) => {
 		query = `
         	SELECT COUNT(*) as duplicateComment 
 				FROM POST_COMMENTS 
-				WHERE body = '${body}' && 
+				WHERE body = ${body} && 
 					post_id=${req.params.post_id} && 
 					user_id=${req.user.id};
     	`;
@@ -277,8 +283,9 @@ exports.getPostsHandler = (req, res, next) => {
 		SELECT 
 			concat(substr(p.body, 1, 300), "....") as body, 
 			p.id, p.user_id as author_id, p.created_at, 
-			up.github_username, u.name as author_name,
-			max(r.reaction) as reaction,
+			up.profile_image_url as author_dp_url, 
+			u.avatar_colour_code as author_avatar_color, 
+			u.name as author_name, max(r.reaction) as reaction,
 			count(c.id) as comments
 			FROM POSTS p
 			INNER JOIN USER_PROFILES up ON p.user_id = up.user_id
@@ -310,8 +317,9 @@ exports.getSinglePostHandler = (req, res, next) => {
 			SELECT 
 				p.body, 
 				p.id, p.user_id as author_id, p.created_at, 
-				up.github_username, u.name as author_name,
-				max(r.reaction) as reaction
+				up.profile_image_url as author_dp_url, 
+				u.avatar_colour_code as author_avatar_color, 
+				u.name as author_name, max(r.reaction) as reaction
 			FROM POSTS p
 			INNER JOIN USER_PROFILES up ON p.user_id = up.user_id
 			INNER JOIN USERS u ON u.id = p.user_id
@@ -320,7 +328,9 @@ exports.getSinglePostHandler = (req, res, next) => {
 			GROUP BY p.id;
 			SELECT
 				c.body, c.created_at, c.id, c.user_id as author_id,
-				up.github_username, u.name as author_name
+				up.profile_image_url as author_dp_url, 
+				u.avatar_colour_code as author_avatar_color, 
+				u.name as author_name
 			FROM POST_COMMENTS c
 			INNER JOIN USER_PROFILES up ON c.user_id = up.user_id
 			INNER JOIN USERS u ON u.id = c.user_id

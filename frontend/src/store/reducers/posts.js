@@ -8,6 +8,7 @@ import {
 	DELETE_COMMENT,
 	GET_SINGLE_POST,
 	SINGLE_POST_LOADER,
+	CLEAR_POST_STATE,
 } from '../types';
 
 // Initial Auth State
@@ -34,15 +35,18 @@ const postReducers = (state = initialState, action) => {
 		case POST_REACTION:
 			return {
 				...state,
-				posts: state.posts.map((it) => {
-					if (it.id === action.payload.id)
-						return {
-							...it,
-							reacting: undefined,
-							reaction: action.payload.reaction === it.reaction ? null : action.payload.reaction,
-						};
-					return it;
-				}),
+				posts: state.posts
+					? state.posts.map((it) => {
+							if (it.id === action.payload.id)
+								return {
+									...it,
+									reacting: undefined,
+									reaction:
+										action.payload.reaction === it.reaction ? null : action.payload.reaction,
+								};
+							return it;
+					  })
+					: state.posts,
 				singlePost: state.singlePost.postDetails
 					? {
 							...state.singlePost,
@@ -117,6 +121,8 @@ const postReducers = (state = initialState, action) => {
 					},
 				},
 			};
+		case CLEAR_POST_STATE:
+			return initialState;
 		default: {
 			return state;
 		}

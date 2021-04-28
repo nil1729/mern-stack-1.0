@@ -12,6 +12,7 @@ import {
 	PageContainer,
 	StyledTextArea,
 	StyledInputErrorMessage,
+	AvatarImage,
 } from '../utils/styled-components/components';
 import Spinner from 'react-bootstrap/Spinner';
 import { connect } from 'react-redux';
@@ -194,14 +195,20 @@ const Posts = ({
 									key={post.id}
 									className='py-3 list-group-item d-flex align-items-center justify-content-evenly mb-3 border-top'
 								>
-									<div className='text-center'>
-										<img
-											src='https://avatars3.githubusercontent.com/u/54589036?v=4'
-											alt=''
-											className='img-fluid'
-											style={styles.image}
+									<div className='text-center' style={{ flex: 0.25 }}>
+										<AvatarImage
+											size='sm'
+											name={post.author_name}
+											colorCode={post.author_avatar_color}
 										/>
-										<h6 className='mt-1 text-primary'>{post.author_name}</h6>
+										<h6
+											className='mt-2 text-primary text-capitalize'
+											style={{ whiteSpace: 'nowrap' }}
+										>
+											{post.author_name.length > 10
+												? post.author_name.substr(0, 10).concat('...')
+												: post.author_name}
+										</h6>
 									</div>
 									<div style={{ flex: 1.5 }} className='ml-5'>
 										<p

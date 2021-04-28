@@ -100,6 +100,7 @@ const Login = ({ authState: { isAuthenticated }, signInUser, ...rest }) => {
 						Email Address<sup>*</sup>
 					</StyledLabel>
 					<StyledInput
+						required
 						disabled={submitted}
 						name='email'
 						type='email'
@@ -120,6 +121,7 @@ const Login = ({ authState: { isAuthenticated }, signInUser, ...rest }) => {
 						Password<sup>*</sup>
 					</StyledLabel>
 					<StyledInput
+						required
 						disabled={submitted}
 						name='password'
 						type='password'

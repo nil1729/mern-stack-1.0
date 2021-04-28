@@ -30,19 +30,18 @@ const Developers = () => {
 			</p>
 			<div className='list-group'>
 				<div className='py-3 list-group-item d-flex align-items-center justify-content-evenly'>
-					<div>
-						<img
+					<div className='avatar__container'>
+						{/* <img
 							src='https://avatars3.githubusercontent.com/u/54589036?v=4'
 							alt=''
 							className='img-fluid'
 							style={styles.image}
-						/>
+						/> */}
+						<div className='user__short__name'>ND</div>
 					</div>
 					<div style={{ flex: 1.5 }} className='mx-4'>
 						<h5>Nilanjan Deb</h5>
-						<p style={{ fontSize: '14px' }}>
-							Frontend Web Developer at Student Union Tech Team
-						</p>
+						<p style={{ fontSize: '14px' }}>Frontend Web Developer at Student Union Tech Team</p>
 						<p style={{ fontSize: '15px' }}>
 							<i className='fal fa-map-marker-alt mr-1'></i>
 							Pilani, Rajasthan

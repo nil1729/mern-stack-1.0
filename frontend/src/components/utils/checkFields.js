@@ -1,7 +1,7 @@
-const validator = require('validator');
+import validator from 'validator';
 class checker {
 	alphabetic(word) {
-		if (word && validator.matches(word, /^[A-Za-z\s]+$/)) return true;
+		if (word && validator.isAlpha(word)) return true;
 		return false;
 	}
 	email(email) {

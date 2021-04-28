@@ -30,11 +30,19 @@ const Register = ({ signUpUser, authState: { isAuthenticated } }) => {
 
 	// Set Login initials Form state
 	const [submitted, setSubmitted] = useState(false);
-	const [userInput, setUserInput] = useState({ email: '', password: '', name: '' });
+	const [userInput, setUserInput] = useState({
+		email: '',
+		password: '',
+		confirm_password: '',
+		first_name: '',
+		last_name: '',
+	});
 	const [wrongUserInput, setWrongUserInput] = useState({
 		email: false,
 		password: false,
-		name: false,
+		first_name: false,
+		last_name: false,
+		confirm_password: false,
 	});
 
 	// On change handler
@@ -55,23 +63,51 @@ const Register = ({ signUpUser, authState: { isAuthenticated } }) => {
 		e.preventDefault();
 
 		// Validate email and password strength
-		if (!validateInput(userInput.name, userInput.email, userInput.password)) return;
+		if (
+			!validateInput(
+				userInput.first_name.trim(),
+				userInput.last_name.trim(),
+				userInput.email,
+				userInput.password
+			)
+		)
+			return;
+
+		// Password Confirmation
+		if (userInput.password !== userInput.confirm_password)
+			return setWrongUserInput({ ...wrongUserInput, confirm_password: true });
+
+		// create user registration data
+		let userRegistrationData = {
+			name: `${userInput.first_name.trim()} ${userInput.last_name.trim()}`,
+			email: userInput.email,
+			password: userInput.password,
+		};
 
 		setSubmitted(true);
 
 		// call redux action with data
-		const isSuccess = await signUpUser(userInput);
+		const isSuccess = await signUpUser(userRegistrationData);
 
 		if (!isSuccess) setSubmitted(false);
 	};
 
 	// validate input
-	const validateInput = (name, email, password) => {
-		// check name
-		if (!checker.alphabetic(name)) {
+	const validateInput = (first_name, last_name, email, password) => {
+		// check first_name
+		if (!checker.alphabetic(first_name)) {
 			setWrongUserInput({
 				...wrongUserInput,
-				name: true,
+				first_name: true,
+			});
+			return false;
+		}
+
+		// check last_name
+		if (!checker.alphabetic(last_name)) {
+			setWrongUserInput({
+				...wrongUserInput,
+				last_name: true,
 			});
 			return false;
 		}
@@ -107,31 +143,59 @@ const Register = ({ signUpUser, authState: { isAuthenticated } }) => {
 
 			<form style={{ fontSize: '14px' }} onSubmit={submitHandler}>
 				<div className='mb-3'>
-					<StyledLabel className='form-label mb-1'>
-						Name<sup>*</sup>
-					</StyledLabel>
-					<StyledInput
-						disabled={submitted}
-						name='name'
-						type='text'
-						value={userInput.name}
-						onChange={onChange}
-						className={`form-control ${wrongUserInput.name ? 'wrong_input' : ''}`}
-						placeholder='Nilanjan Deb'
-					/>
-					{wrongUserInput.name ? (
-						<StyledInputErrorMessage>
-							Please provide a Name with only alphabetic characters
-						</StyledInputErrorMessage>
-					) : (
-						<></>
-					)}
+					<div className='row'>
+						<div className='col'>
+							<StyledLabel className='form-label mb-1'>
+								First Name<sup>*</sup>
+							</StyledLabel>
+							<StyledInput
+								required
+								disabled={submitted}
+								name='first_name'
+								type='text'
+								value={userInput.first_name}
+								onChange={onChange}
+								className={`form-control ${wrongUserInput.first_name ? 'wrong_input' : ''}`}
+								placeholder='Nilanjan'
+							/>{' '}
+							{wrongUserInput.first_name ? (
+								<StyledInputErrorMessage>
+									Please use only english alphabetic characters
+								</StyledInputErrorMessage>
+							) : (
+								<></>
+							)}
+						</div>
+						<div className='col'>
+							<StyledLabel className='form-label mb-1'>
+								Last Name<sup>*</sup>
+							</StyledLabel>
+							<StyledInput
+								required
+								disabled={submitted}
+								name='last_name'
+								type='text'
+								value={userInput.last_name}
+								onChange={onChange}
+								className={`form-control ${wrongUserInput.last_name ? 'wrong_input' : ''}`}
+								placeholder='Deb'
+							/>{' '}
+							{wrongUserInput.last_name ? (
+								<StyledInputErrorMessage>
+									Please use only english alphabetic characters
+								</StyledInputErrorMessage>
+							) : (
+								<></>
+							)}
+						</div>
+					</div>
 				</div>
 				<div className='mb-3'>
 					<StyledLabel className='form-label mb-1'>
 						Email Address<sup>*</sup>
 					</StyledLabel>
 					<StyledInput
+						required
 						disabled={submitted}
 						name='email'
 						type='email'
@@ -152,6 +216,7 @@ const Register = ({ signUpUser, authState: { isAuthenticated } }) => {
 						Password<sup>*</sup>
 					</StyledLabel>
 					<StyledInput
+						required
 						disabled={submitted}
 						name='password'
 						type='password'
@@ -172,7 +237,20 @@ const Register = ({ signUpUser, authState: { isAuthenticated } }) => {
 					<StyledLabel className='form-label mb-1'>
 						Confirm Password<sup>*</sup>
 					</StyledLabel>
-					<StyledInput type='password' className='form-control' />
+					<StyledInput
+						disabled={submitted}
+						required
+						name='confirm_password'
+						value={userInput.confirm_password}
+						onChange={onChange}
+						type='password'
+						className='form-control'
+					/>
+					{wrongUserInput.confirm_password ? (
+						<StyledInputErrorMessage>Please make sure your password match</StyledInputErrorMessage>
+					) : (
+						<></>
+					)}
 				</div>
 				<button disabled={submitted} type='submit' className='btn btn-info btn-sm'>
 					{submitted ? (
