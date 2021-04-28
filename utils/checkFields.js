@@ -5,6 +5,10 @@ class checker {
 		if (word && validator.matches(word, /^[A-Za-z\s]+$/)) return true;
 		return false;
 	}
+	numeric(num) {
+		if (num && validator.default.isInt(num)) return true;
+		return false;
+	}
 	email(email) {
 		if (email && validator.isEmail(email)) return true;
 		return false;

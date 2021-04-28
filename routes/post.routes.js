@@ -9,6 +9,7 @@ const express = require('express'),
 		updateCommentHandler,
 		deleteCommentHandler,
 		reactionHandler,
+		getSinglePostHandler,
 	} = require('../controllers/post.controllers'),
 	{
 		checkAuthentication,
@@ -23,6 +24,7 @@ router
 
 router
 	.route('/:post_id')
+	.get(checkAuthentication, getSinglePostHandler)
 	.put(checkAuthentication, postAuthorize, updatePostHandler)
 	.delete(checkAuthentication, postAuthorize, deletePostHandler);
 

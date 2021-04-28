@@ -62,9 +62,25 @@ exports.addComment = (data, res, next) => {
 	db.query(query, (err, result) => {
 		if (err) return next(err);
 
-		res.status(201).json({
-			success: true,
-			message: 'Your comment added to the post',
+		query = `
+			SELECT 
+				c.body as body, 
+				c.id, c.user_id as author_id, c.created_at, 
+				up.github_username, u.name as author_name
+			FROM POST_COMMENTS c
+			INNER JOIN USER_PROFILES up ON c.user_id = up.user_id
+			INNER JOIN USERS u ON u.id = c.user_id
+			WHERE c.id = ${result.insertId}
+		`;
+
+		db.query(query, (err, result) => {
+			if (err) return next(err);
+
+			res.status(201).json({
+				success: true,
+				message: 'Your comment added to the post',
+				newComment: result[0],
+			});
 		});
 	});
 };

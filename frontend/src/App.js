@@ -51,7 +51,7 @@ const App = ({ loadUser }) => {
 				<PrivateRoute path='/dashboard/profile' exact component={EditProfile} />
 				<PrivateRoute path='/dashboard/education' exact component={Education} />
 				<PrivateRoute path='/posts' exact component={Posts} />
-				<PrivateRoute path='/posts/:id' exact component={ViewPost} />
+				<PrivateRoute path='/posts/:postID' exact component={ViewPost} />
 				<Redirect from='/logout' to='/' />
 			</Switch>
 		</Router>

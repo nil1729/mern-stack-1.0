@@ -119,9 +119,9 @@ const Posts = ({
 				<i className='fas fa-users mr-2'></i>
 				Welcome to the community
 			</p>
+			<p className='lead bg-info px-2 py-1 text-light'>Say Something ...</p>
 			{user && !user.new_account ? (
 				<>
-					<p className='lead bg-info px-2 py-1 text-light'>Say Something ...</p>
 					<form style={{ fontSize: '14px' }} onSubmit={submitHandler}>
 						<StyledTextArea
 							disabled={submitted}

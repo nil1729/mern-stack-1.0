@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 
 const PageContainer = styled.div`
 	width: 65%;
@@ -84,6 +85,22 @@ const StyledHelperText = styled.small`
 	color: grey;
 `;
 
+const TimestampComponent = ({ timestamp }) => {
+	let currDate = new Date(timestamp);
+	const tDate = currDate.getDate();
+	const tDateOrder = moment(currDate).format('Do').slice(-2);
+	const tMonth = moment(currDate).format('MMMM');
+	const tYear = currDate.getFullYear();
+
+	return (
+		<>
+			{' '}
+			{tDate}
+			<sup>{tDateOrder}</sup> {tMonth} {tYear}, {moment(currDate).format('hh:mm a')}
+		</>
+	);
+};
+
 export {
 	PageContainer,
 	StyledInput,
@@ -95,4 +112,5 @@ export {
 	GreyLinkButton,
 	TableItem,
 	StyledInputGroupText,
+	TimestampComponent,
 };

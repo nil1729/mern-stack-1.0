@@ -7,12 +7,15 @@ import {
 	ADD_COMMENT,
 	DELETE_POST,
 	DELETE_COMMENT,
+	GET_SINGLE_POST,
+	SINGLE_POST_LOADER,
 } from '../types';
 
 // Initial Auth State
 const initialState = {
 	posts: null,
 	loading: null,
+	singlePost: { postDetails: null, loading: null },
 };
 
 // Reducer
@@ -42,15 +45,48 @@ const postReducers = (state = initialState, action) => {
 					return it;
 				}),
 			};
-		case ADD_COMMENT:
-			return initialState;
 		case DELETE_POST:
 			return {
 				...state,
 				posts: state.posts.filter((it) => it.id !== action.payload),
 			};
+		case SINGLE_POST_LOADER:
+			return {
+				...state,
+				singlePost: {
+					...state.singlePost,
+					loading: action.payload,
+				},
+			};
+		case GET_SINGLE_POST:
+			return {
+				...state,
+				singlePost: { postDetails: action.payload, loading: false },
+			};
+		case ADD_COMMENT:
+			return {
+				...state,
+				singlePost: {
+					...state.singlePost,
+					postDetails: {
+						...state.singlePost.postDetails,
+						comments: [action.payload, ...state.singlePost.postDetails.comments],
+					},
+				},
+			};
 		case DELETE_COMMENT:
-			return initialState;
+			return {
+				...state,
+				singlePost: {
+					...state.singlePost,
+					postDetails: {
+						...state.singlePost.postDetails,
+						comments: state.singlePost.postDetails.comments.filter(
+							(it) => it.id !== action.payload
+						),
+					},
+				},
+			};
 		default: {
 			return state;
 		}

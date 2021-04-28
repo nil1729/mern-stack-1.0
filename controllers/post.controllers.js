@@ -299,3 +299,44 @@ exports.getPostsHandler = (req, res, next) => {
 		});
 	});
 };
+
+exports.getSinglePostHandler = (req, res, next) => {
+	let requestedUserID = req.user ? req.user.id : null;
+
+	if (!checker.numeric(req.params.post_id))
+		return next(new ErrorResponse('Not found any posts with given arguments on our records', 404));
+
+	let query = `
+			SELECT 
+				p.body, 
+				p.id, p.user_id as author_id, p.created_at, 
+				up.github_username, u.name as author_name,
+				max(r.reaction) as reaction
+			FROM POSTS p
+			INNER JOIN USER_PROFILES up ON p.user_id = up.user_id
+			INNER JOIN USERS u ON u.id = p.user_id
+			LEFT JOIN POST_REACTIONS r ON r.post_id = p.id && r.user_id = ${requestedUserID}
+			WHERE p.id = ${req.params.post_id}
+			GROUP BY p.id;
+			SELECT
+				c.body, c.created_at, c.id, c.user_id as author_id,
+				up.github_username, u.name as author_name
+			FROM POST_COMMENTS c
+			INNER JOIN USER_PROFILES up ON c.user_id = up.user_id
+			INNER JOIN USERS u ON u.id = c.user_id
+			WHERE c.post_id = ${req.params.post_id}
+			ORDER BY c.created_at DESC;
+		`;
+
+	// execute the query
+	db.query(query, (err, result) => {
+		if (err) return next(err);
+
+		// Send responses to client
+		res.status(result[0][0] ? 200 : 404).json({
+			success: result[0][0] ? true : false,
+			message: result[0][0] ? undefined : 'Not found any posts with given arguments on our records',
+			results: result[0][0] ? { post: result[0][0], comments: result[1] || [] } : undefined,
+		});
+	});
+};
