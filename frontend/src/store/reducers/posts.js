@@ -83,10 +83,12 @@ const postReducers = (state = initialState, action) => {
 		case ADD_COMMENT:
 			return {
 				...state,
-				posts: state.posts.map((it) => {
-					if (it.id === action.payload.post_id) return { ...it, comments: it.comments + 1 };
-					return it;
-				}),
+				posts: state.posts
+					? state.posts.map((it) => {
+							if (it.id === action.payload.post_id) return { ...it, comments: it.comments + 1 };
+							return it;
+					  })
+					: state.posts,
 				singlePost: {
 					...state.singlePost,
 					postDetails: {
@@ -98,11 +100,22 @@ const postReducers = (state = initialState, action) => {
 		case DELETE_COMMENT:
 			return {
 				...state,
-				posts: state.posts.map((it) => {
-					if (it.id === action.payload.postID)
-						return { ...it, comments: it.comments > 0 ? it.comments - 1 : 0 };
-					return it;
-				}),
+				posts: state.posts
+					? state.posts.map((it) => {
+							if (it.id === action.payload.postID)
+								return { ...it, comments: it.comments > 0 ? it.comments - 1 : 0 };
+							return it;
+					  })
+					: state.posts,
+				singlePost: {
+					...state.singlePost,
+					postDetails: {
+						...state.singlePost.postDetails,
+						comments: state.singlePost.postDetails.comments.filter(
+							(it) => it.id !== action.payload.commentID
+						),
+					},
+				},
 			};
 		default: {
 			return state;
