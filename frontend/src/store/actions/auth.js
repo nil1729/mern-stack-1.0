@@ -117,6 +117,7 @@ const signUpUser = ({ name, email, password }) => async (dispatch) => {
 
 // logout user
 const logOut = () => async (dispatch) => {
+	setAuthToken();
 	dispatch({ type: CLEAR_ALERTS });
 	dispatch({ type: LOG_OUT });
 	dispatch({ type: CLEAR_USER_PROFILE });

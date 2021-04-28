@@ -26,26 +26,6 @@ import {
 } from '../../store/actions/posts';
 import Spinner from 'react-bootstrap/Spinner';
 
-const styles = {
-	postAvatar: {
-		borderRadius: '50%',
-		height: '15vh',
-	},
-	commentAvatar: {
-		borderRadius: '50%',
-		height: '10vh',
-	},
-	discussionBadge: {
-		position: 'absolute',
-		height: '1.3rem',
-		width: '1.3rem',
-		borderRadius: '50%',
-		top: '-13px',
-		right: '-5px',
-		fontSize: '13px',
-	},
-};
-
 function createMarkup(body) {
 	return { __html: body };
 }
@@ -162,7 +142,7 @@ const ViewPost = ({
 									<AvatarImage
 										name={currentPost.author_name}
 										colorCode={currentPost.author_avatar_color}
-										imageURL={''}
+										imageURL={currentPost.author_dp_url}
 									/>
 									<h6
 										className='mt-2 text-primary text-capitalize'
@@ -298,6 +278,7 @@ const ViewPost = ({
 											<AvatarImage
 												name={comment.author_name}
 												colorCode={comment.author_avatar_color}
+												imageURL={comment.author_dp_url}
 												size='sm'
 											/>
 											<p

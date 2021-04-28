@@ -4,9 +4,16 @@ const express = require('express'),
 
 router.get('/', checkAuthentication, (req, res, next) => {
 	let queryFields = ``;
-	['name', 'github_username', 'skills', 'current_working_place_name', 'current_position'].forEach(
-		(field) => (queryFields += `${field},`)
-	);
+	[
+		'name',
+		'profile_image_url',
+		'skills',
+		'current_working_place_name',
+		'current_position',
+		'avatar_colour_code',
+		'user_id',
+		'username',
+	].forEach((field) => (queryFields += `${field},`));
 	queryFields = queryFields.slice(0, -1);
 	if (req.user) queryFields += ',location';
 

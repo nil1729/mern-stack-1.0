@@ -25,10 +25,6 @@ import {
 import moment from 'moment';
 
 const styles = {
-	image: {
-		borderRadius: '50%',
-		height: '15vh',
-	},
 	discussionBadge: {
 		position: 'absolute',
 		height: '1.3rem',
@@ -200,6 +196,7 @@ const Posts = ({
 											size='sm'
 											name={post.author_name}
 											colorCode={post.author_avatar_color}
+											imageURL={post.author_dp_url}
 										/>
 										<h6
 											className='mt-2 text-primary text-capitalize'
