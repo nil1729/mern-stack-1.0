@@ -31,6 +31,7 @@ const loadUser = () => async (dispatch) => {
 				: null,
 		});
 	} catch (e) {
+		setAuthToken();
 		dispatch({ type: AUTH_ERROR });
 		dispatch({ type: STOP_INITIAL_LOADER });
 		if (e.response && e.response.status === 403) {

@@ -21,7 +21,8 @@ router.get('/', checkAuthentication, (req, res, next) => {
 	let query = `
         SELECT ${queryFields}
             FROM USERS u
-			INNER JOIN USER_PROFILES up ON u.id = up.user_id;
+			INNER JOIN USER_PROFILES up ON u.id = up.user_id
+			ORDER BY up.created_at desc;
     `;
 
 	db.query(query, (err, results) => {

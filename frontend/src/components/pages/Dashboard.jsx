@@ -238,7 +238,7 @@ const Developers = ({
 					</tbody>
 				</table>
 			</div>
-			<button className='mt-4 text-uppercase btn btn-sm btn-danger'>
+			<button disabled className='mt-4 text-uppercase btn btn-sm btn-danger'>
 				<i className='fas fa-user-times mr-2'></i>delete my account
 			</button>
 		</PageContainer>

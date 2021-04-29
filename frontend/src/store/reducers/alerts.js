@@ -8,12 +8,16 @@ const initialState = null;
 const alertReducers = (state = initialState, action) => {
 	switch (action.type) {
 		case ADD_ALERTS:
-			return action.payload;
+			console.log(state, action.payload);
+			return state
+				? Array.isArray(state)
+					? [action.payload, ...state]
+					: [action.payload, state]
+				: action.payload;
 		case CLEAR_ALERTS:
 			return initialState;
-		default: {
+		default:
 			return state;
-		}
 	}
 };
 

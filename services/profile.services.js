@@ -170,7 +170,12 @@ exports.getProfile = (username, fields, res, next) => {
 				// Fetch Github Stats
 				if (user_profile.github_username) {
 					fetch(
-						`https://api.github.com/users/${user_profile.github_username}/repos?sort=updated&per_page=5&direction=desc`
+						`https://api.github.com/users/${user_profile.github_username}/repos?sort=updated&per_page=5&direction=desc`,
+						{
+							headers: {
+								Authorization: `token ${process.env.GITHUB_TOKEN}`,
+							},
+						}
 					)
 						.then((res) => res.json())
 						.then((data) => {

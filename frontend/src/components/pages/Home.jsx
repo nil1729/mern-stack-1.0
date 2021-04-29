@@ -6,15 +6,17 @@
  *
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { signInUser } from '../../store/actions/auth';
 
 // Assets
 import background from '../utils/assets/home-bg.jpg';
 
 const styles = {
 	homeContainer: {
-		background: `linear-gradient(rgba(0, 0, 0, 0.707), rgba(0, 0, 0, 0.611)),
+		background: `linear-gradient(rgba(155, 155, 155, 0.7), rgba(0, 0, 0, 0.711), rgba(0, 0, 0, 0.9)),
 		url(${background})`,
 		backgroundRepeat: 'no-repeat',
 		backgroundPosition: 'center',
@@ -26,7 +28,18 @@ const styles = {
 	},
 };
 
-const Home = () => {
+const Home = ({ authState: { isAuthenticated, loading, user }, signInUser }) => {
+	const [demoBtnDisable, setDemoBtnDisable] = useState(false);
+
+	const demoLoginHandler = async () => {
+		setDemoBtnDisable(true);
+		await signInUser({
+			email: 'nilanjan.deb@gmail.in',
+			password: '3Mu#feBSBeV8HY6gY2Giiw@RXK@tt5',
+		});
+		setDemoBtnDisable(false);
+	};
+
 	return (
 		<>
 			<div
@@ -36,21 +49,33 @@ const Home = () => {
 				<div className='text-center text-light'>
 					<h1>Developers Connector</h1>
 					<p className='lead'>
-						Create a developer profile/portfolio, share posts and get help from
-						other developers.
+						Create a developer profile/portfolio, share posts and get help from other developers.
 					</p>
-					<div>
-						<Link to='/register' className='btn btn-sm btn-primary mr-3'>
-							Sign Up
-						</Link>
-						<Link to='/login' className='btn btn-sm btn-light'>
-							Login
-						</Link>
-					</div>
+					{!isAuthenticated && !loading ? (
+						<div>
+							<button
+								disabled={demoBtnDisable}
+								onClick={demoLoginHandler}
+								className='btn btn-sm btn-secondary'
+							>
+								Demo Login
+							</button>
+							<Link to='/register' className='btn btn-sm btn-primary mx-3'>
+								Sign Up
+							</Link>
+							<Link to='/login' className='btn btn-sm btn-light '>
+								Login
+							</Link>
+						</div>
+					) : null}
 				</div>
 			</div>
 		</>
 	);
 };
 
-export default Home;
+const mapStateToProps = (state) => ({
+	authState: state.AUTH_STATE,
+});
+
+export default connect(mapStateToProps, { signInUser })(Home);

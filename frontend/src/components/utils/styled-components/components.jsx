@@ -133,9 +133,9 @@ const TimestampComponent = ({ timestamp }) => {
 };
 
 const AvatarImage = ({ name, colorCode, imageURL, size }) => {
-	let height = 75;
-	let width = 75;
-	let fontSize = 30;
+	let height;
+	let width;
+	let fontSize;
 	switch (size) {
 		case 'sm':
 			height = 60;
@@ -146,7 +146,11 @@ const AvatarImage = ({ name, colorCode, imageURL, size }) => {
 			height = 125;
 			width = 125;
 			fontSize = 45;
+			break;
 		default:
+			height = 75;
+			width = 75;
+			fontSize = 30;
 			break;
 	}
 	// convert to string

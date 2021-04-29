@@ -55,7 +55,7 @@ const Developers = ({ fetchDevelopers, devState: { developers, loading } }) => {
 						developers.map((dev) => (
 							<div
 								key={dev.user_id}
-								className='py-3 list-group-item d-flex align-items-center justify-content-evenly'
+								className='py-3 list-group-item d-flex align-items-center justify-content-evenly border-top mb-3'
 							>
 								<AvatarImage
 									name={dev.name}

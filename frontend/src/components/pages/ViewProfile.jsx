@@ -8,7 +8,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { Link } from 'react-router-dom';
 import {
 	PageContainer,
 	GreyLinkButton,
