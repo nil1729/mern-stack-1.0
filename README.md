@@ -62,9 +62,20 @@
 
      ```
 
+---
+
 ### Website Preview
 
 ## <img src="./preview.png" alt="Nilanjan Deb">
+
+---
+
+### TODO:
+
+- Email Verification by Send Grid API
+- User Profile Image upload feature (Cloudinary API)
+- Forgot Password Feature
+- Pagination feature on Posts and Developers page
 
 ---
 
