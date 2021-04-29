@@ -1,9 +1,21 @@
-const ErrorResponse = require('../utils/errorResponse');
+const ErrorResponse = require('../utils/errorResponse'),
+	xss = require('xss'),
+	fetch = require('node-fetch');
 
 exports.createProfile = (data, res, next) => {
 	// Create query for SQL
 	let fields = ``;
 	let values = ``;
+
+	// JSON Stringified bio
+	if (data.body.bio && data.body.bio.length > 0) {
+		fields += `bio,`;
+		values += `${data.body.bio},`;
+		delete data.body.bio;
+		data.incomingFields = data.incomingFields.filter((it) => it !== 'bio');
+	}
+
+	// Other fields
 	data.incomingFields.forEach((key) => {
 		fields += `${key},`;
 		values += `"${data.body[key]}",`;
@@ -40,6 +52,13 @@ exports.createProfile = (data, res, next) => {
 exports.updateProfile = (data, res, next) => {
 	// Create query for SQL
 	let setQuery = ``;
+
+	// JSON Stringified bio
+	if (data.body.bio && data.body.bio.length > 0) {
+		setQuery += `bio=${data.body.bio},`;
+		delete data.body.bio;
+		data.incomingFields = data.incomingFields.filter((it) => it !== 'bio');
+	}
 
 	data.incomingFields.forEach((key) => {
 		setQuery += `${key}="${data.body[key]}",`;
@@ -79,7 +98,9 @@ exports.getProfile = (username, fields, res, next) => {
 		WHERE USERS.USERNAME = "${username}";
 	`;
 
-	let user_profile, user_job_experiences, user_education_credits;
+	let user_profile,
+		job_experiences = [],
+		education_credits = [];
 
 	// execute the query
 	db.query(query, (err, result) => {
@@ -109,7 +130,7 @@ exports.getProfile = (username, fields, res, next) => {
 		db.query(query, (err, jobResults) => {
 			if (err) return next(err);
 
-			user_job_experiences = jobResults;
+			job_experiences = jobResults;
 
 			// Create string for select fields
 			queryFields = ``;
@@ -131,13 +152,56 @@ exports.getProfile = (username, fields, res, next) => {
 			db.query(query, (err, eduResults) => {
 				if (err) return next(err);
 
-				user_education_credits = eduResults;
+				education_credits = eduResults;
 
-				// Send responses to client
-				return res.status(200).json({
+				let response = {
 					success: true,
-					results: { user_profile, user_job_experiences, user_education_credits },
-				});
+					results: {
+						user_profile: { ...user_profile, bio: xss(user_profile.bio) },
+						user_job_experiences: job_experiences.map((it) => {
+							return { ...it, job_description: xss(it.job_description) };
+						}),
+						user_education_credits: education_credits.map((it) => {
+							return { ...it, program_description: xss(it.program_description) };
+						}),
+					},
+				};
+
+				// Fetch Github Stats
+				if (user_profile.github_username) {
+					fetch(
+						`https://api.github.com/users/${user_profile.github_username}/repos?sort=updated&per_page=5&direction=desc`
+					)
+						.then((res) => res.json())
+						.then((data) => {
+							if (Array.isArray(data)) {
+								response.results.git_stats = data.map((it) => {
+									let {
+										id,
+										name,
+										html_url,
+										description,
+										stargazers_count: stars,
+										watchers_count: watchers,
+										forks_count: forks,
+									} = it;
+									return {
+										id,
+										name,
+										html_url,
+										description,
+										stars,
+										watchers,
+										forks,
+									};
+								});
+							}
+							return res.status(200).json(response);
+						})
+						.catch((err) => {
+							return next(err);
+						});
+				} else return res.status(200).json(response);
 			});
 		});
 	});
@@ -147,6 +211,15 @@ exports.addExperience = (data, res, next) => {
 	// Create query for SQL
 	let fields = ``;
 	let values = ``;
+
+	// JSON Stringified bio
+	if (data.body.job_description && data.body.job_description.length > 0) {
+		fields += `job_description,`;
+		values += `${data.body.job_description},`;
+		delete data.body.job_description;
+		data.incomingFields = data.incomingFields.filter((it) => it !== 'job_description');
+	}
+
 	data.incomingFields.forEach((key) => {
 		fields += `${key},`;
 		values += `"${data.body[key]}",`;
@@ -219,6 +292,15 @@ exports.addEducation = (data, res, next) => {
 	// Create query for SQL
 	let fields = ``;
 	let values = ``;
+
+	// JSON Stringified bio
+	if (data.body.program_description && data.body.program_description.length > 0) {
+		fields += `program_description,`;
+		values += `${data.body.program_description},`;
+		delete data.body.program_description;
+		data.incomingFields = data.incomingFields.filter((it) => it !== 'program_description');
+	}
+
 	data.incomingFields.forEach((key) => {
 		fields += `${key},`;
 		values += `"${data.body[key]}",`;

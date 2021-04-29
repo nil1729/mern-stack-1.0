@@ -7,41 +7,15 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { PageContainer, GreyLinkButton, TableItem } from '../utils/styled-components/components';
+import {
+	PageContainer,
+	GreyLinkButton,
+	TableItem,
+	DurationComponent,
+} from '../utils/styled-components/components';
 import Spinner from 'react-bootstrap/Spinner';
 import { connect } from 'react-redux';
 import { fetchDashboard, deleteCreditFromAccount } from '../../store/actions/user_profile';
-import moment from 'moment';
-
-const DurationComponent = ({ startingDate, endingDate }) => {
-	const sDate = new Date(startingDate).getDate();
-	const sDateOrder = moment(startingDate).format('Do').slice(-2);
-	const sMonth = moment(startingDate).format('MMMM');
-	const sYear = new Date(startingDate).getFullYear();
-
-	let eDate, eDateOrder, eMonth, eYear;
-	if (endingDate) {
-		eDate = new Date(endingDate).getDate();
-		eDateOrder = moment(endingDate).format('Do').slice(-2);
-		eMonth = moment(endingDate).format('MMMM');
-		eYear = new Date(endingDate).getFullYear();
-	}
-
-	return (
-		<TableItem>
-			{sDate}
-			<sup>{sDateOrder}</sup> {sMonth} {sYear} -{' '}
-			{!endingDate ? (
-				'Now'
-			) : (
-				<>
-					{eDate}
-					<sup>{eDateOrder}</sup> {eMonth} {eYear}
-				</>
-			)}
-		</TableItem>
-	);
-};
 
 const Developers = ({
 	authState: { isAuthenticated, user },
@@ -147,10 +121,12 @@ const Developers = ({
 										<tr key={exp.id}>
 											<TableItem>{exp.company_name}</TableItem>
 											<TableItem>{exp.job_title}</TableItem>
-											<DurationComponent
-												startingDate={exp.starting_date}
-												endingDate={exp.ending_date}
-											/>
+											<TableItem>
+												<DurationComponent
+													startingDate={exp.starting_date}
+													endingDate={exp.ending_date}
+												/>
+											</TableItem>
 											<TableItem>
 												<button
 													disabled={exp.deleting}
@@ -224,10 +200,12 @@ const Developers = ({
 										<tr key={edu.id}>
 											<TableItem>{edu.school_name}</TableItem>
 											<TableItem>{edu.degree}</TableItem>
-											<DurationComponent
-												startingDate={edu.starting_date}
-												endingDate={edu.ending_date}
-											/>
+											<TableItem>
+												<DurationComponent
+													startingDate={edu.starting_date}
+													endingDate={edu.ending_date}
+												/>
+											</TableItem>
 											<TableItem>
 												<button
 													disabled={edu.deleting}

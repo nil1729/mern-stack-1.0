@@ -9,7 +9,12 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
-import { PageContainer, GreyLinkButton, AvatarImage } from '../utils/styled-components/components';
+import {
+	PageContainer,
+	GreyLinkButton,
+	AvatarImage,
+	DurationComponent,
+} from '../utils/styled-components/components';
 import { connect } from 'react-redux';
 import { fetchDeveloperProfile } from '../../store/actions/developers';
 import Spinner from 'react-bootstrap/Spinner';
@@ -181,6 +186,15 @@ const ViewProfile = ({
 									<i className='fal fa-globe'></i>
 								</SocialLink>
 							) : null}
+							{singleDeveloper.user_profile.github_username ? (
+								<SocialLink
+									rel='noreferrer'
+									target='_blank'
+									href={`https://github.com/${singleDeveloper.user_profile.github_username}`}
+								>
+									<i className='fab fa-github'></i>
+								</SocialLink>
+							) : null}
 							{singleDeveloper.user_profile.twitter_url ? (
 								<SocialLink
 									rel='noreferrer'
@@ -190,15 +204,6 @@ const ViewProfile = ({
 									<i className='fab fa-twitter'></i>
 								</SocialLink>
 							) : null}
-							{singleDeveloper.user_profile.facebook_url ? (
-								<SocialLink
-									rel='noreferrer'
-									target='_blank'
-									href={singleDeveloper.user_profile.facebook_url}
-								>
-									<i className='fab fa-facebook-f'></i>
-								</SocialLink>
-							) : null}
 							{singleDeveloper.user_profile.linkedin_url ? (
 								<SocialLink
 									rel='noreferrer'
@@ -206,6 +211,15 @@ const ViewProfile = ({
 									href={singleDeveloper.user_profile.linkedin_url}
 								>
 									<i className='fab fa-linkedin-in'></i>
+								</SocialLink>
+							) : null}
+							{singleDeveloper.user_profile.facebook_url ? (
+								<SocialLink
+									rel='noreferrer'
+									target='_blank'
+									href={singleDeveloper.user_profile.facebook_url}
+								>
+									<i className='fab fa-facebook-f'></i>
 								</SocialLink>
 							) : null}
 							{singleDeveloper.user_profile.youtube_channel_url ? (
@@ -260,81 +274,129 @@ const ViewProfile = ({
 					<div style={styles.eduExpContainer} className='edu__exp__container mt-4'>
 						<GridChildDiv className='exp__container border p-3'>
 							<h5 className='text-primary mb-3'>Experience</h5>
-							{[1, 2].map((id, index) => (
-								<GridChildInfo key={id} last={index === [1, 2].length - 1 ? true : false}>
-									<h6 style={{ color: 'black' }} className='mb-1'>
-										Student Union Tech Team
-									</h6>
-									<GridPara>
-										26<sup>th</sup> September 2019 - Now
-									</GridPara>
-									<GridPara>
-										<HeaderTitleSpan>Position:</HeaderTitleSpan>
-										Web Developer
-									</GridPara>
-									<GridPara className='d-flex'>
-										<HeaderTitleSpan>Description:</HeaderTitleSpan>
-										<span>Learning new Technologies and Working on College Project</span>
-									</GridPara>
-								</GridChildInfo>
-							))}
+							{singleDeveloper.user_job_experiences &&
+							singleDeveloper.user_job_experiences.length === 0 ? (
+								<h6 style={{ color: 'black' }} className='mt-3'>
+									Developer didn't add any job experience yet
+								</h6>
+							) : (
+								<>
+									{singleDeveloper.user_job_experiences &&
+										singleDeveloper.user_job_experiences.map((exp, index) => (
+											<GridChildInfo
+												key={exp.id}
+												last={
+													index === singleDeveloper.user_job_experiences.length - 1 ? true : false
+												}
+											>
+												<h6 style={{ color: 'black' }} className='mb-1'>
+													{exp.company_name}
+												</h6>
+												{exp.starting_date ? (
+													<GridPara>
+														<DurationComponent
+															startingDate={exp.starting_date}
+															endingDate={exp.ending_date}
+														/>
+													</GridPara>
+												) : null}
+												<GridPara>
+													<HeaderTitleSpan>Position:</HeaderTitleSpan>
+													{exp.job_title}
+												</GridPara>
+												{exp.job_description ? (
+													<GridPara className='d-flex'>
+														<HeaderTitleSpan>Description:</HeaderTitleSpan>
+														<span
+															dangerouslySetInnerHTML={createMarkup(exp.job_description)}
+														></span>
+													</GridPara>
+												) : null}
+											</GridChildInfo>
+										))}
+								</>
+							)}
 						</GridChildDiv>
 						<GridChildDiv className='edu__container border p-3'>
 							<h5 className='text-primary mb-3'>Education</h5>
-							{[1].map((id, index) => (
-								<GridChildInfo key={id} last={index === [1].length - 1 ? true : false}>
-									<h6 style={{ color: 'black' }} className='mb-1'>
-										BITS Pilani, Pilani Campus
-									</h6>
-									<GridPara>
-										26<sup>th</sup> September 2019 - Now
-									</GridPara>
-									<GridPara>
-										<HeaderTitleSpan>Degree:</HeaderTitleSpan>
-										Bachelor of Engineering
-									</GridPara>
-									<GridPara>
-										<HeaderTitleSpan>Field of Study:</HeaderTitleSpan>
-										Computer Science
-									</GridPara>
-									<GridPara className='d-flex'>
-										<HeaderTitleSpan>Description:</HeaderTitleSpan>
-										<span>
-											Learn about theoretical Computer Science. eg: Object Oriented Programming,
-											Discrete Mathematics etc.
-										</span>
-									</GridPara>
-								</GridChildInfo>
-							))}
+							{singleDeveloper.user_education_credits &&
+							singleDeveloper.user_education_credits.length === 0 ? (
+								<h6 style={{ color: 'black' }} className='mt-3'>
+									Developer didn't add any education credit yet
+								</h6>
+							) : (
+								<>
+									{singleDeveloper.user_education_credits &&
+										singleDeveloper.user_education_credits.map((edu, index) => (
+											<GridChildInfo
+												key={edu.id}
+												last={
+													index === singleDeveloper.user_education_credits.length - 1 ? true : false
+												}
+											>
+												<h6 style={{ color: 'black' }} className='mb-1'>
+													{edu.school_name}
+												</h6>
+												{edu.starting_date ? (
+													<GridPara>
+														<DurationComponent
+															startingDate={edu.starting_date}
+															endingDate={edu.ending_date}
+														/>
+													</GridPara>
+												) : null}
+												<GridPara>
+													<HeaderTitleSpan>Degree:</HeaderTitleSpan>
+													{edu.degree}
+												</GridPara>
+												{edu.field_of_study ? (
+													<GridPara>
+														<HeaderTitleSpan>Field of Study:</HeaderTitleSpan>
+														{edu.field_of_study}
+													</GridPara>
+												) : null}
+
+												{edu.program_description ? (
+													<GridPara className='d-flex'>
+														<HeaderTitleSpan>Description:</HeaderTitleSpan>
+														<span
+															dangerouslySetInnerHTML={createMarkup(edu.program_description)}
+														></span>
+													</GridPara>
+												) : null}
+											</GridChildInfo>
+										))}
+								</>
+							)}
 						</GridChildDiv>
 					</div>
 					{/* Github Repositories */}
-					<div className='git__repo__container'>
-						<h5 className='text-primary'>Github Repositories</h5>
-						{[1, 2, 3, 4, 5].map((id) => (
-							<div className='list-group mt-3' key={id}>
-								<div className='py-2 list-group-item list-group-item-action d-flex align-items-center'>
-									<div className='repo__desc' style={{ flex: 2 }}>
-										<h6 className='text-info text-capitalize'>
-											<a href='https://github.com/' target='_blank' rel='noreferrer'>
-												food-order-app
-											</a>
-										</h6>
-										<p style={{ fontSize: '13.3px' }}>
-											Simple Food Ordering Website (NodeJS, ExpressJS, MongoDB, Bootstrap)
-										</p>
-									</div>
-									<div className='repo__stats' style={{ flex: 0.3 }}>
-										<BadgeLink className='btn btn-info'>Stars: 1</BadgeLink>
-										<BadgeLink className='btn btn-dark'>Watchers: 2</BadgeLink>
-										<BadgeLink grey className='btn text-dark'>
-											Forks: 1
-										</BadgeLink>
+					{singleDeveloper.git_stats && singleDeveloper.git_stats.length > 0 ? (
+						<div className='git__repo__container'>
+							<h5 className='text-primary'>Github Repositories</h5>
+							{singleDeveloper.git_stats.map((repo) => (
+								<div className='list-group mt-3' key={repo.id}>
+									<div className='py-2 list-group-item list-group-item-action d-flex align-items-center'>
+										<div className='repo__desc' style={{ flex: 2 }}>
+											<h6 className='text-info text-capitalize'>
+												<a href={repo.html_url} target='_blank' rel='noreferrer'>
+													{repo.name}
+												</a>
+											</h6>
+											<p style={{ fontSize: '13.3px' }}>{repo.description}</p>
+										</div>
+										<div className='repo__stats' style={{ flex: 0.3 }}>
+											<BadgeLink className='btn btn-info'>Stars: {repo.stars}</BadgeLink>
+											<BadgeLink className='btn btn-dark'>Watchers: {repo.watchers}</BadgeLink>
+											<BadgeLink grey className='btn text-dark'>
+												Forks: {repo.forks}
+											</BadgeLink>
+										</div>
 									</div>
 								</div>
-							</div>
-						))}
-					</div>{' '}
+							))}
+						</div>
+					) : null}{' '}
 				</>
 			)}
 		</PageContainer>

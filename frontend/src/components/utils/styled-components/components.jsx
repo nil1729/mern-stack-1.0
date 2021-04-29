@@ -86,6 +86,36 @@ const StyledHelperText = styled.small`
 	color: grey;
 `;
 
+const DurationComponent = ({ startingDate, endingDate }) => {
+	const sDate = new Date(startingDate).getDate();
+	const sDateOrder = moment(startingDate).format('Do').slice(-2);
+	const sMonth = moment(startingDate).format('MMMM');
+	const sYear = new Date(startingDate).getFullYear();
+
+	let eDate, eDateOrder, eMonth, eYear;
+	if (endingDate) {
+		eDate = new Date(endingDate).getDate();
+		eDateOrder = moment(endingDate).format('Do').slice(-2);
+		eMonth = moment(endingDate).format('MMMM');
+		eYear = new Date(endingDate).getFullYear();
+	}
+
+	return (
+		<>
+			{sDate}
+			<sup>{sDateOrder}</sup> {sMonth} {sYear} -{' '}
+			{!endingDate ? (
+				'Now'
+			) : (
+				<>
+					{eDate}
+					<sup>{eDateOrder}</sup> {eMonth} {eYear}
+				</>
+			)}
+		</>
+	);
+};
+
 const TimestampComponent = ({ timestamp }) => {
 	let currDate = new Date(timestamp);
 	const tDate = currDate.getDate();
@@ -173,6 +203,7 @@ export {
 	GreyLinkButton,
 	TableItem,
 	StyledInputGroupText,
+	DurationComponent,
 	TimestampComponent,
 	AvatarImage,
 };

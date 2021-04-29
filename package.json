@@ -22,6 +22,7 @@
 		"express-async-errors": "^3.1.1",
 		"jsonwebtoken": "^8.5.1",
 		"mysql": "^2.18.1",
+		"node-fetch": "^2.6.1",
 		"validator": "^13.5.2",
 		"xss": "^1.0.8"
 	},

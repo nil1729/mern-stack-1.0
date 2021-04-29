@@ -155,7 +155,7 @@ const ViewPost = ({
 								</div>
 								<div style={{ flex: 1.5 }} className='ml-5'>
 									<p
-										style={{ fontSize: '13px' }}
+										style={{ fontSize: '13px', whiteSpace: 'pre' }}
 										className='mb-2 text-dark'
 										dangerouslySetInnerHTML={createMarkup(currentPost.body)}
 									></p>
@@ -292,7 +292,7 @@ const ViewPost = ({
 										</div>
 										<div style={{ flex: 1.5 }} className='ml-5'>
 											<p
-												style={{ fontSize: '13px' }}
+												style={{ fontSize: '13px', whiteSpace: 'pre' }}
 												className='mb-2 text-dark'
 												dangerouslySetInnerHTML={createMarkup(comment.body)}
 											></p>

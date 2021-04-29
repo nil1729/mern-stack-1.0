@@ -144,7 +144,7 @@ exports.profileHandler = (req, res, next) => {
 		if (errors.length > 0)
 			return next(new ErrorResponse('Please provide valid URL(s)', 400, errors));
 
-		if (req.body.bio) req.body.bio = xss(req.body.bio);
+		if (req.body.bio) req.body.bio = JSON.stringify(req.body.bio);
 
 		// proceed further
 		let data = {
@@ -167,7 +167,7 @@ exports.profileHandler = (req, res, next) => {
 			'name',
 			'username',
 			'avatar_colour_code',
-			'users.id as dev_id',
+			'USERS.id as dev_id',
 			'current_position',
 			'current_working_place_name',
 			'skills',
@@ -176,6 +176,7 @@ exports.profileHandler = (req, res, next) => {
 			'website_url',
 			'twitter_url',
 			'youtube_channel_url',
+			'github_username',
 		];
 		let privateJobFields = ['location', 'job_description', 'starting_date', 'ending_date'];
 		let publicJobFields = ['job_title', 'company_name'];
@@ -232,7 +233,7 @@ exports.profileHandler = (req, res, next) => {
 		}
 		if (errors.length > 0) next(new ErrorResponse('Please provide valid URL(s)', 400, errors));
 
-		if (req.body.bio) req.body.bio = xss(req.body.bio);
+		if (req.body.bio) req.body.bio = JSON.stringify(req.body.bio);
 
 		// proceed further
 		let data = {
@@ -285,7 +286,7 @@ exports.addExperience = (req, res, next) => {
 	if (errors.length > 0) next(new ErrorResponse('Please provide valid Date(s)', 400, errors));
 
 	// if job description added
-	if (req.body.job_description) req.body.job_description = xss(req.body.job_description);
+	if (req.body.job_description) req.body.job_description = JSON.stringify(req.body.job_description);
 
 	// proceed further
 	let data = {
@@ -398,7 +399,7 @@ exports.addEducation = (req, res, next) => {
 
 	// if program description added
 	if (req.body.program_description)
-		req.body.program_description = xss(req.body.program_description);
+		req.body.program_description = JSON.stringify(req.body.program_description);
 
 	// proceed further
 	let data = {
