@@ -27,18 +27,19 @@
 
 1. **Prerequisites**
 
-   - NodeJS installed on your Local machine
-   - MySQL (version 8.0) installed on your local machine or have any MySQL database hosted online (I use [CloudClusters](https://www.cloudclusters.io/) for my project).
+  - NodeJS installed on your Local machine
+  - MySQL (version 8.0) installed on your local machine or have any MySQL database hosted online 
+    - First I use [CloudClusters](https://www.cloudclusters.io/) for my project.
+    - Now, I am using [Digital Ocean](https://m.do.co/c/bf7c82c22af1) Droplet to install mysql and use it remotely to my app.
 
 2. **Project Setup**
 
    - Clone this Repository or Download the zip File.
-     ```
-      >> git clone https://github.com/nil1729/mern-stack-1.0
-     ```
+        ```
+        $ git clone https://github.com/nil1729/mern-stack-1.0
+        ```
    - Create a new file named `.env` on `root` directory which contains all of our secret credentials for this project.
-
-     ```
+        ```
         DB_HOST = <Database Hostname>
         DB_PORT = <Database Port>
         DB_USER = <Database User>
@@ -49,18 +50,17 @@
         JWT_RANDOM_STRING = <Any Random String>
         JWT_COOKIE_MAX_AGE = 86400
         GITHUB_TOKEN = <Personal Access Token for Github API>
-     ```
+        ```
 
    - Run this command
 
-     ```
-      >> npm run dev  // to start React Development server and Backend server together.
+        ```
+        $ npm run dev  // to start React Development server and Backend server together.
 
-      >> npm run server // to start only Backend server
+        $ npm run server // to start only Backend server
 
-      >> npm run Client // to start React Development server only (But it will not working alone as api depends on Backend also)
-
-     ```
+        $ npm run Client // to start React Development server only (But it will not working alone as api depends on Backend also)
+        ```
 
 ---
 
