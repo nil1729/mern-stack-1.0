@@ -1,4 +1,4 @@
-if (process.env.NODE_ENV !== 'production') require('dotenv').config();
+require('dotenv').config();
 
 // Importing all necessary modules
 const express = require('express'),
@@ -21,7 +21,6 @@ app.use(cookieParser());
 // use logger for development
 if (process.env.NODE_ENV !== 'production') {
 	app.use(require('morgan')('dev'));
-	
 }
 app.use(require('cors')());
 // Database Setup (Create Connection to Database)
